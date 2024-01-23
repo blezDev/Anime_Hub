@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Anime Hub</string>
+    <string name="personal_list_text">My List</string>
+    <string name="info_text">Info</string>
+    <string name="play_text">Play</string>
+    <string name="recent_release">Just Arrived</string>
+</resources>
