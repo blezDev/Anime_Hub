@@ -5,5 +5,5 @@ import com.blez.anime_player_compose.feature_detail_info.domain.model.AnimeInfoM
 
 interface InfoRepository {
 
-    suspend fun getAnimeInfo(animeId: String, page: Int): ResultState<AnimeInfoModel>
+    suspend fun getAnimeInfo(animeId: String): ResultState<AnimeInfoModel>
 }

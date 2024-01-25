@@ -24,7 +24,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.PlayCircleFilled
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -207,12 +209,15 @@ fun EpisodeCard(
     episodeUrl: String,
     modifier: Modifier = Modifier,
     textColor: Color = Color.White,
-    imageUrl: String
+    imageUrl: String,
+    synopsis : String
 ) {
 
-    Row(modifier = modifier
-        .fillMaxSize()
-        .padding(5.dp)) {
+    Row(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(5.dp)
+    ) {
         Box(
             modifier = modifier
                 .fillMaxSize(0.4f)
@@ -247,12 +252,13 @@ fun EpisodeCard(
             Text(text = "Episode $episodeNumber", color = textColor)
             Spacer(modifier = Modifier.height(5.dp))
             Text(text = "source", color = Color.Blue, textDecoration = TextDecoration.Underline)
+            Spacer(modifier = Modifier.height(5.dp))
+            Text(text = synopsis, color = textColor)
 
         }
 
     }
-
-
-
 }
+
+
 

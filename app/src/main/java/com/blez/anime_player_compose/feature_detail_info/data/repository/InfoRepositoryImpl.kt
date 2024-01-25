@@ -10,7 +10,7 @@ import com.blez.anime_player_compose.feature_detail_info.domain.repository.InfoR
 
 class InfoRepositoryImpl(val context: Context, val infoAPI: InfoAPI) : InfoRepository {
 
-    override suspend fun getAnimeInfo(animeId: String, page: Int): ResultState<AnimeInfoModel> {
+    override suspend fun getAnimeInfo(animeId: String): ResultState<AnimeInfoModel> {
         val cache = RunningCache.animeDetails
         if (!context.checkForInternetConnection()) {
             return ResultState.Error("Couldn\'t reach server. Check your internet connection.")
@@ -18,7 +18,7 @@ class InfoRepositoryImpl(val context: Context, val infoAPI: InfoAPI) : InfoRepos
         if (cache[animeId] != null) {
             return ResultState.Success(data = cache[animeId])
         } else {
-            val result = infoAPI.getAnimeInfo(animeId, page)
+            val result = infoAPI.getAnimeInfo(animeId)
             if (result.code() == 200 && result.body() != null) {
                 return ResultState.Success(data = result.body())
             }

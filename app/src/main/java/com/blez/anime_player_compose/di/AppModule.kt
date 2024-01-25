@@ -9,6 +9,10 @@ import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.Dashboar
 import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.RecentReleaseUseCase
 import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.TopAiringUseCase
 import com.blez.anime_player_compose.feature_detail_info.data.remote.InfoAPI
+import com.blez.anime_player_compose.feature_detail_info.data.repository.InfoRepositoryImpl
+import com.blez.anime_player_compose.feature_detail_info.domain.repository.InfoRepository
+import com.blez.anime_player_compose.feature_detail_info.domain.use_cases.DetailsUseCases
+import com.blez.anime_player_compose.feature_detail_info.domain.use_cases.InfoDetails
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -77,6 +81,11 @@ object AppModule {
         return DashboardRepositoryImpl(context = context, dashboardAPI = dashboardAPI)
     }
 
+    @Singleton
+    @Provides
+    fun providesInfoRepository(context: Context,infoAPI: InfoAPI) : InfoRepository{
+        return InfoRepositoryImpl(context = context, infoAPI = infoAPI)
+    }
 
     @Singleton
     @Provides
@@ -89,14 +98,25 @@ object AppModule {
         return TopAiringUseCase(repository)
     }
 
-
     @Singleton
     @Provides
-    fun providesDashboardUseCases(releaseUseCase: RecentReleaseUseCase,topAiringUseCase: TopAiringUseCase): DashboardUseCases {
-        return DashboardUseCases(releaseUseCase,topAiringUseCase)
+    fun providesInfoUseCase(repository: InfoRepository): InfoDetails {
+        return InfoDetails(repository)
     }
 
 
+    @Singleton
+    @Provides
+    fun providesDashboardUseCases(releaseUseCase: RecentReleaseUseCase,topAiringUseCase: TopAiringUseCase,infoDetails: InfoDetails): DashboardUseCases {
+        return DashboardUseCases(releaseUseCase,topAiringUseCase,infoDetails)
+    }
+
+    @Singleton
+    @Provides
+    fun providesDetailsUseCases(infoDetails: InfoDetails) : DetailsUseCases{
+        return DetailsUseCases(infoDetails)
+
+    }
 
 
 
