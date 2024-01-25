@@ -56,6 +56,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.blez.anime_player_compose.R
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.EpisodeCard
 import com.blez.anime_player_compose.feature_detail_info.domain.model.Episode
@@ -83,6 +86,7 @@ fun DetailScreen(
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var backPressHandled by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.pochi))
     BackHandler(enabled = !backPressHandled) {
         backPressHandled = true
         coroutineScope.launch {
@@ -93,7 +97,20 @@ fun DetailScreen(
     }
     when (state) {
         is DetailViewModel.DetailsUIEvent.Failure -> {}
-        DetailViewModel.DetailsUIEvent.Loading -> {}
+        DetailViewModel.DetailsUIEvent.Loading -> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column {
+                    LottieAnimation(
+                        modifier = Modifier.size(250.dp),
+                        composition = composition,
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(text = "Loading..")
+                }
+
+            }
+        }
+
         is DetailViewModel.DetailsUIEvent.Success -> {
             val data = (state as DetailViewModel.DetailsUIEvent.Success).data
             val image = data.image

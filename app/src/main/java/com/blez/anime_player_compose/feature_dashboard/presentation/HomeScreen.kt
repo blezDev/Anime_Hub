@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -44,6 +45,10 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieAnimatable
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.blez.anime_player_compose.R
 import com.blez.anime_player_compose.common.util.Screen
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.AnimeCard
@@ -75,7 +80,7 @@ fun HomeScreen(
     }
     val state by dashboardViewModel.fetchState.collectAsState()
     val trendingState by dashboardViewModel.topAiringState.collectAsState()
-
+    val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.meowjo))
 
 
     Column {
@@ -85,7 +90,17 @@ fun HomeScreen(
             }
 
             DashboardViewModel.AiringUIEvent.Loading -> {
-
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                    Column {
+                        LottieAnimation(
+                            modifier = Modifier.size(250.dp),
+                            composition = composition,
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        Text(text = "Loading..")
+                    }
+                    
+                }
             }
 
             is DashboardViewModel.AiringUIEvent.Success -> {
@@ -180,7 +195,7 @@ fun HomeScreen(
             }
 
             DashboardViewModel.UIEvent.Loading -> {
-                Toast.makeText(context, "Loading", Toast.LENGTH_SHORT).show()
+
             }
 
             is DashboardViewModel.UIEvent.Success -> {
