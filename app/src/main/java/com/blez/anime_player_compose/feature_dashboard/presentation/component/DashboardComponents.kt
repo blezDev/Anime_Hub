@@ -153,7 +153,7 @@ fun AnimeCard(
     onClicked: () -> Unit,
     textColor: Color = Color.Black,
 ) {
-    Column(modifier.fillMaxSize()) {
+    Column(modifier.fillMaxSize().clickable { onClicked() }) {
         Box(modifier = modifier.fillMaxWidth()) {
             SubcomposeAsyncImage(
                 modifier = modifier

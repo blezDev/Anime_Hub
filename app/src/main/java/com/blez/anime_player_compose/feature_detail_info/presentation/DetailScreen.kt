@@ -1,8 +1,13 @@
 package com.blez.anime_player_compose.feature_detail_info.presentation
 
+import android.view.Window
+import android.view.WindowManager
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +37,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,21 +54,44 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import com.blez.anime_player_compose.R
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.EpisodeCard
 import com.blez.anime_player_compose.feature_detail_info.domain.model.Episode
 import com.blez.anime_player_compose.feature_detail_info.presentation.components.ExpandableText
+import kotlinx.coroutines.android.awaitFrame
+import kotlinx.coroutines.launch
 
 
 @Composable
-fun DetailScreen(detailViewModel: DetailViewModel = hiltViewModel()) {
+fun DetailScreen(
+    detailViewModel: DetailViewModel = hiltViewModel(),
+    animeId: String,
+    navController: NavHostController,
+    window: Window
+) {
+    window.setFlags(
+        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+    )
     DisposableEffect(Unit) {
-        detailViewModel.fetchDetails("ore-dake-level-up-na-ken")
+        detailViewModel.fetchDetails(animeId)
         onDispose {}
     }
     val state by detailViewModel.detailState.collectAsState()
-    when(state){
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    var backPressHandled by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    BackHandler(enabled = !backPressHandled) {
+        backPressHandled = true
+        coroutineScope.launch {
+            awaitFrame()
+            onBackPressedDispatcher?.onBackPressed()
+            backPressHandled = false
+        }
+    }
+    when (state) {
         is DetailViewModel.DetailsUIEvent.Failure -> {}
         DetailViewModel.DetailsUIEvent.Loading -> {}
         is DetailViewModel.DetailsUIEvent.Success -> {
@@ -139,7 +171,7 @@ fun DetailScreen(detailViewModel: DetailViewModel = hiltViewModel()) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(top = 10.dp),
+                            .padding(top = 20.dp, start = 5.dp),
                         contentAlignment = Alignment.TopStart
                     ) {
                         Image(
@@ -148,14 +180,19 @@ fun DetailScreen(detailViewModel: DetailViewModel = hiltViewModel()) {
                             modifier = Modifier
                                 .width(50.dp)
                                 .height(45.dp)
-                                .padding(7.dp),
+                                .padding(7.dp)
+                                .clickable {
+                                    backPressHandled = !backPressHandled
+                                    navController.popBackStack()
+
+                                },
                             contentScale = ContentScale.FillBounds
                         )
                     }
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(top = 10.dp, end = 5.dp),
+                            .padding(top = 20.dp, end = 5.dp),
                         contentAlignment = Alignment.TopEnd
                     ) {
                         Image(
@@ -235,7 +272,11 @@ fun DetailScreen(detailViewModel: DetailViewModel = hiltViewModel()) {
                         Spacer(modifier = Modifier.width(5.dp))
                         Text(text = " | ", color = Color.White, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.width(5.dp))
-                        Text(text = "Status : $status", color = Color.White, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = "Status : $status",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
                         Spacer(modifier = Modifier.width(15.dp))
                         Box(
                             modifier = Modifier
@@ -305,7 +346,11 @@ fun DetailScreen(detailViewModel: DetailViewModel = hiltViewModel()) {
                                     tint = Color.White
                                 )
                                 Spacer(modifier = Modifier.width(5.dp))
-                                Text(text = "Dowload", color = textColor, fontWeight = FontWeight.Bold)
+                                Text(
+                                    text = "Dowload",
+                                    color = textColor,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
 
                         }

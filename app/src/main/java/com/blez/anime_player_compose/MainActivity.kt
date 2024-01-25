@@ -7,8 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.blez.anime_player_compose.feature_dashboard.presentation.HomeScreen
-import com.blez.anime_player_compose.feature_detail_info.presentation.DetailScreen
+import androidx.navigation.compose.rememberNavController
+import com.blez.anime_player_compose.common.navigation.SetupNavGraph
+import com.blez.anime_player_compose.common.util.Screen
 import com.blez.anime_player_compose.ui.theme.Anime_player_composeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,7 +24,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Black
                 ) {
-                 DetailScreen()
+                    val window = window
+                    val navHostController = rememberNavController()
+                    SetupNavGraph(navHostController, startDestination = Screen.HomeScreen.route,window)
                 }
             }
         }

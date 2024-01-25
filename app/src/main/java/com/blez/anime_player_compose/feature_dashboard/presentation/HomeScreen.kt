@@ -1,5 +1,7 @@
 package com.blez.anime_player_compose.feature_dashboard.presentation
 
+import android.view.Window
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -38,20 +40,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import com.blez.anime_player_compose.R
+import com.blez.anime_player_compose.common.util.Screen
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.AnimeCard
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.InfoButton
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.ListButton
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.PlayButton
 
-@Preview(showSystemUi = true, showBackground = true)
+
 @Composable
 fun HomeScreen(
     backgroundColor: Color = Color(24, 18, 43),
-    dashboardViewModel: DashboardViewModel = hiltViewModel()
+    dashboardViewModel: DashboardViewModel = hiltViewModel(),
+    navController: NavHostController,
+    window: Window
 ) {
+    window.setFlags(
+        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+    )
     val image = R.drawable.aot
     val genres = arrayOf("Action", "Drama", "Adventure", "Thriller")
     dashboardViewModel.fetchRecentRelease()
@@ -174,8 +185,11 @@ fun HomeScreen(
 
             is DashboardViewModel.UIEvent.Success -> {
                 val result = (state as DashboardViewModel.UIEvent.Success)
-                BoxWithConstraints(modifier = Modifier
-                    .fillMaxSize()) {
+
+                BoxWithConstraints(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
                     LazyVerticalGrid(
                         modifier = Modifier
                             .fillMaxSize()
@@ -192,7 +206,11 @@ fun HomeScreen(
                                     animeId = result.data.results[it].id,
                                     textColor = Color.White,
                                     onClicked = {
-
+                                        navController.navigate(
+                                            route = Screen.DetailScreen.passAnimeId(
+                                                result.data.results[it].id
+                                            )
+                                        )
                                     }
                                 )
                             }
