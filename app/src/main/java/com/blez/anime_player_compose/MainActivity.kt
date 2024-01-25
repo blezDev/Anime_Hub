@@ -8,6 +8,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.blez.anime_player_compose.feature_dashboard.presentation.HomeScreen
+import com.blez.anime_player_compose.feature_detail_info.presentation.DetailScreen
 import com.blez.anime_player_compose.ui.theme.Anime_player_composeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,7 +23,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Black
                 ) {
-                  HomeScreen()
+                 DetailScreen()
                 }
             }
         }

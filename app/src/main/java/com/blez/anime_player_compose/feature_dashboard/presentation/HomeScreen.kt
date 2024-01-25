@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -173,27 +174,30 @@ fun HomeScreen(
 
             is DashboardViewModel.UIEvent.Success -> {
                 val result = (state as DashboardViewModel.UIEvent.Success)
-                LazyVerticalGrid(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(10.dp),
-                    columns = GridCells.Adaptive(150.dp),
-                    content = {
-                        items((state as DashboardViewModel.UIEvent.Success).data.results.size) {
-                            AnimeCard(
-                                modifier = Modifier.padding(2.dp),
-                                imageUrl = result.data.results[it].image,
-                                title = result.data.results[it].title,
-                                episodeNumber = result.data.results[it].episodeNumber,
-                                episodeId = result.data.results[it].episodeId,
-                                animeId = result.data.results[it].id,
-                                textColor = Color.White,
-                                onClicked = {
+                BoxWithConstraints(modifier = Modifier
+                    .fillMaxSize()) {
+                    LazyVerticalGrid(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(10.dp),
+                        columns = GridCells.Adaptive(180.dp),
+                        content = {
+                            items((state as DashboardViewModel.UIEvent.Success).data.results.size) {
+                                AnimeCard(
+                                    modifier = Modifier.padding(2.dp),
+                                    imageUrl = result.data.results[it].image,
+                                    title = result.data.results[it].title,
+                                    episodeNumber = result.data.results[it].episodeNumber,
+                                    episodeId = result.data.results[it].episodeId,
+                                    animeId = result.data.results[it].id,
+                                    textColor = Color.White,
+                                    onClicked = {
 
-                                }
-                            )
-                        }
-                    })
+                                    }
+                                )
+                            }
+                        })
+                }
             }
         }
 
