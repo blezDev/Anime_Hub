@@ -4,4 +4,7 @@
     <string name="info_text">Info</string>
     <string name="play_text">Play</string>
     <string name="recent_release">New Episode Releases</string>
+    <string name="recent_added">New Added</string>
+    <string name="top_airing">Trending</string>
+    <string name="completed_anime">Completed</string>
 </resources>

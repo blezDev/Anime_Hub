@@ -1,11 +1,8 @@
 package com.blez.anime_player_compose.feature_dashboard.presentation.component
 
-import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,15 +15,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.PlayCircleFilled
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -34,12 +26,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.BottomStart
 import androidx.compose.ui.Alignment.Companion.Center
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -147,7 +135,7 @@ fun AnimeCard(
     modifier: Modifier = Modifier,
     imageUrl: String,
     title: String,
-    episodeNumber: Int,
+    episodeNumber: String,
     episodeId: String,
     animeId: String,
     onClicked: () -> Unit,
@@ -157,8 +145,7 @@ fun AnimeCard(
         Box(modifier = modifier.fillMaxWidth()) {
             SubcomposeAsyncImage(
                 modifier = modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.4f),
+                    .size(230.dp),
                 model = imageUrl,
                 contentDescription = "$title Image",
                 loading = { CircularProgressIndicator() },
@@ -185,8 +172,9 @@ fun AnimeCard(
 
             }
         }
+        val trunText = if (title.length > 25) {title.substring(0,25) + " ...."} else title
         Text(
-            text = title,
+            text = trunText,
             color = textColor,
             fontSize = 16.sp,
             textAlign = TextAlign.Center,
@@ -210,7 +198,8 @@ fun EpisodeCard(
     modifier: Modifier = Modifier,
     textColor: Color = Color.White,
     imageUrl: String,
-    synopsis : String
+    title : String,
+    isFiller : Boolean
 ) {
 
     Row(
@@ -227,7 +216,7 @@ fun EpisodeCard(
 
             SubcomposeAsyncImage(
                 modifier = modifier
-                    .fillMaxSize(),
+                    .size(width =  250.dp, height = 140.dp),
                 model = imageUrl,
                 contentDescription = "Anime Image",
                 loading = { CircularProgressIndicator() },
@@ -249,16 +238,45 @@ fun EpisodeCard(
 
         Spacer(modifier = modifier.width(10.dp))
         Column(modifier = modifier.fillMaxHeight()) {
-            Text(text = "Episode $episodeNumber", color = textColor)
+            Text(text = "Episode : $episodeNumber", color = textColor)
             Spacer(modifier = Modifier.height(5.dp))
-            Text(text = "source", color = Color.Blue, textDecoration = TextDecoration.Underline)
+            Text(text = title, color = Color.White,)
             Spacer(modifier = Modifier.height(5.dp))
-            Text(text = synopsis, color = textColor)
+            Text(text = "Filler : $isFiller", color = textColor)
 
         }
 
     }
 }
 
+@Composable
+fun VerticalGrid(composableList: List<@Composable () -> Unit>, itemsPerRow: Int) {
+    val components = composableList.toMutableList()
+    Column(Modifier.fillMaxWidth()) {
+        while (components.isNotEmpty()) {
+            val rowComponents: List<@Composable () -> Unit> = components.take(itemsPerRow)
+            val listOfSpacers: List<@Composable () -> Unit> = listOfSpacers(itemsPerRow - rowComponents.size)
+            RowWithItems(items = rowComponents.plus(listOfSpacers))
+            components.removeAll(rowComponents)
+        }
+    }
+}
 
+private fun listOfSpacers(number: Int): List<@Composable () -> Unit> {
+    val mutableList = emptyList<@Composable () -> Unit>().toMutableList()
+    repeat(number) {
+        mutableList.add { Spacer(Modifier) }
+    }
+    return mutableList.toList()
+}
 
+@Composable
+private fun RowWithItems(items: List<@Composable () -> Unit>) {
+    Row(Modifier.fillMaxWidth()) {
+        items.forEach { item ->
+            Box(Modifier.weight(1f)) {
+                item()
+            }
+        }
+    }
+}

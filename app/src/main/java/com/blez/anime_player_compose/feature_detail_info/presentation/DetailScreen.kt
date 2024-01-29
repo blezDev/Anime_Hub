@@ -71,6 +71,7 @@ import kotlinx.coroutines.launch
 fun DetailScreen(
     detailViewModel: DetailViewModel = hiltViewModel(),
     animeId: String,
+    otherName: String,
     navController: NavHostController,
     window: Window
 ) {
@@ -115,13 +116,12 @@ fun DetailScreen(
             val data = (state as DetailViewModel.DetailsUIEvent.Success).data
             val image = data.image
             val title = data.title
-            val genres = data.genres
-            val releasedYear = data.releaseDate
+
             val totalEpisodes = data.totalEpisodes
-            val status = data.status
+
             val description = data.description
             val textColor = Color.White
-            val otherName = data.otherName
+            val otherName = otherName
             val subOrDub = data.subOrDub
             val episodes = data.episodes
 
@@ -277,8 +277,11 @@ fun DetailScreen(
                     Spacer(modifier = Modifier.height(7.dp))
 
                     Row {
-                        Text(text = releasedYear, color = Color.White, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.width(5.dp))
+                        Text(
+                            text = "Type : ${data.type}",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
                         Text(text = " | ", color = Color.White, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.width(5.dp))
                         Text(
@@ -288,12 +291,6 @@ fun DetailScreen(
                         )
                         Spacer(modifier = Modifier.width(5.dp))
                         Text(text = " | ", color = Color.White, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.width(5.dp))
-                        Text(
-                            text = "Status : $status",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
                         Spacer(modifier = Modifier.width(15.dp))
                         Box(
                             modifier = Modifier
@@ -304,20 +301,18 @@ fun DetailScreen(
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
+                            val sub = if (subOrDub.uppercase() =="BOTH") "SUB & DUB" else subOrDub.uppercase()
+
                             Text(
-                                text = subOrDub.uppercase(),
+                                text = sub,
                                 color = textColor,
                                 modifier = Modifier.padding(2.dp)
                             )
                         }
 
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = "Genre : ${genres.joinToString(", ")}",
-                        color = textColor,
-                        fontWeight = FontWeight.Bold
-                    )
+
+
                     Spacer(modifier = Modifier.height(7.dp))
                     ExpandableText(text = description, modifier = Modifier.fillMaxWidth())
                     Spacer(modifier = Modifier.height(10.dp))
@@ -384,7 +379,8 @@ fun DetailScreen(
                                 episodeNumber = it.number.toString(),
                                 episodeUrl = it.url,
                                 imageUrl = image,
-                                synopsis = "Episode ${it.number} of $title"
+                                title = it.title,
+                                isFiller = it.isFiller
                             )
                         }
                     })

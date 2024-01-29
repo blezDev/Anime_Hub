@@ -5,7 +5,9 @@ import com.blez.anime_player_compose.common.util.Constants
 import com.blez.anime_player_compose.feature_dashboard.data.remote.DashboardAPI
 import com.blez.anime_player_compose.feature_dashboard.data.repository.DashboardRepositoryImpl
 import com.blez.anime_player_compose.feature_dashboard.domain.repository.DashboardRepository
+import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.CompletedAnimeUseCase
 import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.DashboardUseCases
+import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.RecentAddedUseCase
 import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.RecentReleaseUseCase
 import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.TopAiringUseCase
 import com.blez.anime_player_compose.feature_detail_info.data.remote.InfoAPI
@@ -70,20 +72,23 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providesInfoAPI(retrofit: Retrofit) : InfoAPI{
+    fun providesInfoAPI(retrofit: Retrofit): InfoAPI {
         return retrofit
             .create(InfoAPI::class.java)
     }
 
     @Singleton
     @Provides
-    fun providesDashboardRepository(context: Context,dashboardAPI: DashboardAPI) : DashboardRepository{
+    fun providesDashboardRepository(
+        context: Context,
+        dashboardAPI: DashboardAPI
+    ): DashboardRepository {
         return DashboardRepositoryImpl(context = context, dashboardAPI = dashboardAPI)
     }
 
     @Singleton
     @Provides
-    fun providesInfoRepository(context: Context,infoAPI: InfoAPI) : InfoRepository{
+    fun providesInfoRepository(context: Context, infoAPI: InfoAPI): InfoRepository {
         return InfoRepositoryImpl(context = context, infoAPI = infoAPI)
     }
 
@@ -92,6 +97,7 @@ object AppModule {
     fun providesRecentReleaseUseCase(repository: DashboardRepository): RecentReleaseUseCase {
         return RecentReleaseUseCase(repository)
     }
+
     @Singleton
     @Provides
     fun providesTopAiringUseCase(repository: DashboardRepository): TopAiringUseCase {
@@ -104,20 +110,42 @@ object AppModule {
         return InfoDetails(repository)
     }
 
-
     @Singleton
     @Provides
-    fun providesDashboardUseCases(releaseUseCase: RecentReleaseUseCase,topAiringUseCase: TopAiringUseCase,infoDetails: InfoDetails): DashboardUseCases {
-        return DashboardUseCases(releaseUseCase,topAiringUseCase,infoDetails)
+    fun providesRecentAddedUseCase(repository: DashboardRepository): RecentAddedUseCase {
+        return RecentAddedUseCase(repository)
     }
 
     @Singleton
     @Provides
-    fun providesDetailsUseCases(infoDetails: InfoDetails) : DetailsUseCases{
+    fun providesCompletedAnimeUseCase(repository: DashboardRepository): CompletedAnimeUseCase {
+        return CompletedAnimeUseCase(repository)
+    }
+
+    @Singleton
+    @Provides
+    fun providesDashboardUseCases(
+        releaseUseCase: RecentReleaseUseCase,
+        topAiringUseCase: TopAiringUseCase,
+        infoDetails: InfoDetails,
+        recentAddedUseCase: RecentAddedUseCase,
+        completedAnimeUseCase: CompletedAnimeUseCase
+    ): DashboardUseCases {
+        return DashboardUseCases(
+            releaseUseCase,
+            topAiringUseCase,
+            infoDetails,
+            recentAddedUseCase,
+            completedAnimeUseCase
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun providesDetailsUseCases(infoDetails: InfoDetails): DetailsUseCases {
         return DetailsUseCases(infoDetails)
 
     }
-
 
 
 }

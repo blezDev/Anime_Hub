@@ -17,14 +17,22 @@ fun SetupNavGraph(
     startDestination: String,
     window: Window
 ) {
-NavHost(navController = navController , startDestination =startDestination ){
-    composable(route = Screen.HomeScreen.route){
-        HomeScreen(navController = navController,window = window)
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable(route = Screen.HomeScreen.route) {
+            HomeScreen(navController = navController, window = window)
+        }
+        composable(route = Screen.DetailScreen.route, arguments = listOf(navArgument("animeId") {
+            type = NavType.StringType
+        }, navArgument("otherName") {
+            type = NavType.StringType
+            defaultValue = ""
+        })) {
+            DetailScreen(
+                animeId = it.arguments?.getString("animeId").toString(),
+                otherName = it.arguments?.getString("otherName").toString(),
+                navController = navController,
+                window = window
+            )
+        }
     }
-    composable(route = Screen.DetailScreen.route, arguments = listOf(navArgument("animeId"){
-        type = NavType.StringType
-    })){
-        DetailScreen(animeId = it.arguments?.getString("animeId").toString(), navController = navController, window = window)
-    }
-}
 }

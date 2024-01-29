@@ -1,5 +1,6 @@
 package com.blez.anime_player_compose.feature_dashboard.presentation
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,7 @@ import com.blez.anime_player_compose.common.util.ResultState
 import com.blez.anime_player_compose.feature_dashboard.domain.model.Recent_Release_Model
 import com.blez.anime_player_compose.feature_dashboard.domain.model.Result
 import com.blez.anime_player_compose.feature_dashboard.domain.model.Top_Airing
+import com.blez.anime_player_compose.feature_dashboard.domain.model.ZoroModel
 import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.DashboardUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,7 +26,7 @@ class DashboardViewModel @Inject constructor(val dashboardUseCases: DashboardUse
 
     sealed class UIEvent {
         data object Loading : UIEvent()
-        data class Success(val data: Recent_Release_Model) : UIEvent()
+        data class Success(val data: ZoroModel) : UIEvent()
         data class Failure(val message: String) : UIEvent()
 
     }
@@ -35,6 +37,18 @@ class DashboardViewModel @Inject constructor(val dashboardUseCases: DashboardUse
         data class Failure(val message: String) : AiringUIEvent()
     }
 
+    sealed class RecentAddedUIEvent {
+        data object Loading : RecentAddedUIEvent()
+        data class Success(val data: ZoroModel) : RecentAddedUIEvent()
+        data class Failure(val message: String) : RecentAddedUIEvent()
+    }
+
+    sealed class CompletedAnimeUIEvent {
+        data object Loading : CompletedAnimeUIEvent()
+        data class Success(val data: ZoroModel) : CompletedAnimeUIEvent()
+        data class Failure(val message: String) : CompletedAnimeUIEvent()
+
+    }
 
     private val _fetchState = MutableStateFlow<UIEvent>(UIEvent.Loading)
     val fetchState: StateFlow<UIEvent>
@@ -43,6 +57,16 @@ class DashboardViewModel @Inject constructor(val dashboardUseCases: DashboardUse
     private val _topAiringState = MutableStateFlow<AiringUIEvent>(AiringUIEvent.Loading)
     val topAiringState: StateFlow<AiringUIEvent>
         get() = _topAiringState
+
+
+    private val _fetchRecentAdded = MutableStateFlow<RecentAddedUIEvent>(RecentAddedUIEvent.Loading)
+    val fetchRecentAdded: StateFlow<RecentAddedUIEvent>
+        get() = _fetchRecentAdded
+
+    private val _fetchCompletedAnime =
+        MutableStateFlow<CompletedAnimeUIEvent>(CompletedAnimeUIEvent.Loading)
+    val fetchCompletedAnime: StateFlow<CompletedAnimeUIEvent>
+        get() = _fetchCompletedAnime
 
     fun fetchTopAiring(page: Int = 1) {
         viewModelScope.launch {
@@ -88,4 +112,48 @@ class DashboardViewModel @Inject constructor(val dashboardUseCases: DashboardUse
         }
     }
 
+
+    fun fetchRecentAdded(page: Int = 1) {
+        viewModelScope.launch {
+            when (val result = dashboardUseCases.recentAddedUseCase(page)) {
+                is ResultState.Error -> {
+                    _fetchRecentAdded.emit(RecentAddedUIEvent.Failure(result.message.toString()))
+                }
+
+                is ResultState.Loading -> {
+                    _fetchRecentAdded.emit(RecentAddedUIEvent.Loading)
+                }
+
+                is ResultState.Success -> {
+
+                    if (result.data != null)
+                        _fetchRecentAdded.emit(RecentAddedUIEvent.Success(result.data))
+                    else
+                        _fetchRecentAdded.emit(RecentAddedUIEvent.Failure(result.message.toString()))
+                }
+            }
+        }
+    }
+
+
+    fun fetchCompletedAnime(page: Int = 1) {
+        viewModelScope.launch {
+            when (val result = dashboardUseCases.completedAnimeUseCase(page)) {
+                is ResultState.Error -> {
+                    _fetchCompletedAnime.emit(CompletedAnimeUIEvent.Failure(result.message.toString()))
+                }
+
+                is ResultState.Loading -> {
+                    _fetchCompletedAnime.emit(CompletedAnimeUIEvent.Loading)
+                }
+
+                is ResultState.Success -> {
+                    if (result.data != null)
+                        _fetchCompletedAnime.emit(CompletedAnimeUIEvent.Success(result.data))
+                    else
+                        _fetchCompletedAnime.emit(CompletedAnimeUIEvent.Failure(result.message.toString()))
+                }
+            }
+        }
+    }
 }
