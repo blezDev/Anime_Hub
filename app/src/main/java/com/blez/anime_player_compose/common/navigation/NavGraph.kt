@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import com.blez.anime_player_compose.common.util.Screen
 import com.blez.anime_player_compose.feature_dashboard.presentation.HomeScreen
 import com.blez.anime_player_compose.feature_detail_info.presentation.DetailScreen
+import com.blez.anime_player_compose.feature_login.presentation.LoginScreen
 
 @Composable
 fun SetupNavGraph(
@@ -18,6 +19,11 @@ fun SetupNavGraph(
     window: Window
 ) {
     NavHost(navController = navController, startDestination = startDestination) {
+
+        composable(route = Screen.LoginScreen.route){
+            LoginScreen(navController)
+        }
+
         composable(route = Screen.HomeScreen.route) {
             HomeScreen(navController = navController, window = window)
         }

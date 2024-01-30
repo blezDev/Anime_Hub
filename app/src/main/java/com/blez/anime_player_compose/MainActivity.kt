@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.rememberNavController
 import com.blez.anime_player_compose.common.navigation.SetupNavGraph
+import com.blez.anime_player_compose.common.util.CredManager
 import com.blez.anime_player_compose.common.util.Screen
 import com.blez.anime_player_compose.ui.theme.Anime_player_composeTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,9 +25,18 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Black
                 ) {
+                    val credManager = CredManager(this)
                     val window = window
                     val navHostController = rememberNavController()
-                    SetupNavGraph(navHostController, startDestination = Screen.HomeScreen.route,window)
+                    SetupNavGraph(
+                        navHostController,
+                        startDestination = if (credManager.getToken() == null) {
+                            Screen.LoginScreen.route
+                        } else {
+                            Screen.HomeScreen.route
+                        },
+                        window
+                    )
                 }
             }
         }

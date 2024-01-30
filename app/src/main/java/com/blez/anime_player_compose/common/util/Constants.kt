@@ -5,4 +5,13 @@ object Constants {
     const val BASE_URL = "https://consumet-api-production-9702.up.railway.app/"
 
 
+    //SharedPrefs Constants
+    const val PREFS_TOKEN_FILE = "PREFS_TOKEN_FILE"
+    const val USER_TOKEN = "USER_TOKEN"
+    const val USER_PIC = "USER_PIC"
+    const val USER_GIVEN_NAME = "USER_GIVEN_NAME"
+    const val USER_NAME = "USER_NAME"
+    const val USER_FAMILY_NAME = "USER_FAMILY_NAME"
+
+
 }

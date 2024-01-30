@@ -1,6 +1,7 @@
 package com.blez.anime_player_compose.feature_dashboard.data.remote
 
 import com.blez.anime_player_compose.feature_dashboard.domain.model.AnimeDetails
+import com.blez.anime_player_compose.feature_dashboard.domain.model.GoogleProfileModel
 import com.blez.anime_player_compose.feature_dashboard.domain.model.Recent_Release_Model
 import com.blez.anime_player_compose.feature_dashboard.domain.model.SearchDataModel
 import com.blez.anime_player_compose.feature_dashboard.domain.model.Top_Airing
@@ -23,6 +24,8 @@ interface DashboardAPI {
 
     @GET("/anime/zoro/top-airing")
     suspend fun getTopAiring(@Query("page") page: Int) : Response<Top_Airing>
+
+
 
 
 

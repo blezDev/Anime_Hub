@@ -5,6 +5,7 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,17 +25,24 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -43,6 +51,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -52,6 +61,7 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.blez.anime_player_compose.R
+import com.blez.anime_player_compose.common.util.CredManager
 import com.blez.anime_player_compose.common.util.Screen
 import com.blez.anime_player_compose.feature_dashboard.domain.model.Result
 import com.blez.anime_player_compose.feature_dashboard.domain.model.Zoro_Result
@@ -62,7 +72,7 @@ import com.blez.anime_player_compose.feature_dashboard.presentation.component.Pl
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.VerticalGrid
 
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
+
 @Composable
 fun HomeScreen(
     backgroundColor: Color = Color(24, 18, 43),
@@ -79,6 +89,9 @@ fun HomeScreen(
     dashboardViewModel.fetchRecentRelease()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val credManager = CredManager(context)
+    Log.e("TOKEN", credManager.getToken().toString())
+
     DisposableEffect(Unit) {
         dashboardViewModel.fetchRecentRelease()
         dashboardViewModel.fetchTopAiring()
@@ -116,22 +129,147 @@ fun HomeScreen(
 
                 is DashboardViewModel.AiringUIEvent.Success -> {
                     val data = (trendingState as DashboardViewModel.AiringUIEvent.Success).data
-                    val trend = data.results.random()
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.BottomCenter
-                    ) {
+                    val trend by remember {
+                        mutableStateOf(data.results.random())
+                    }
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.BottomCenter
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight(0.3f)
+
+
+                            ) {
+                                SubcomposeAsyncImage(
+                                    model = trend.image,
+                                    contentDescription = "Latest Image",
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(500.dp)
+                                        .clickable {
+                                            navController.navigate(
+                                                Screen.DetailScreen.passAnimeId(
+                                                    trend.id,
+                                                    trend.japaneseTitle
+                                                )
+                                            )
+                                        },
+                                    loading = { CircularProgressIndicator() },
+                                    error = {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.error_png),
+                                            contentDescription = "Error in Image Loading"
+                                        )
+                                    },
+                                )
+
+
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight(0.5f), contentAlignment = Alignment.BottomCenter
+
+                            ) {
+                                Column(modifier = Modifier.padding(bottom = 10.dp)) {
+                                    /*      Row(
+                                              modifier = Modifier
+                                                  .fillMaxWidth()
+                                                  .padding(horizontal = 20.dp),
+                                              horizontalArrangement = Arrangement.SpaceBetween,
+                                          ) {
+                                              for (it in if (trend.genres.isEmpty()) genres.toList() else {
+                                                  if (trend.genres.size > 5) trend.genres.subList(0, 5)
+                                                      .toList() else trend.genres.toList()
+                                              }) {
+                                                  Text(
+                                                      text = it,
+                                                      fontWeight = FontWeight.Bold,
+                                                      color = Color.White
+                                                  )
+                                              }
+                                          }*/
+                                    Text(
+                                        text = trend.title,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White,
+                                        fontSize = 24.sp,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 10.dp)
+                                            .shadow(10.dp),
+                                        overflow = TextOverflow.Clip
+                                    )
+                                    Spacer(modifier = Modifier.height(20.dp))
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 10.dp),
+                                        horizontalArrangement = Arrangement.SpaceAround
+                                    ) {
+                                        ListButton() {
+                                            //TODO LIST ADD FUNCTIONALITY
+                                        }
+                                        PlayButton(
+                                            textModifier = Modifier.padding(horizontal = 9.dp),
+                                            modifier = Modifier
+                                                .clip(
+                                                    RoundedCornerShape(50)
+                                                )
+                                                .shadow(10.dp)
+                                        ) {
+                                            //TODO Play FUNCTIONALITY
+                                        }
+                                        InfoButton {
+                                            //TODO Info FUNCTIONALITY
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .fillMaxHeight(0.3f)
+                                .fillMaxHeight(0.5f)
+                                .padding(top = 60.dp, end = 25.dp),
+                            contentAlignment = Alignment.TopEnd
+
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Search Button",
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .size(55.dp)
+                                    .shadow(10.dp)
+
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(0.5f)
+                                .padding(top = 60.dp, start = 15.dp),
+                            contentAlignment = Alignment.TopStart
 
                         ) {
                             SubcomposeAsyncImage(
-                                model = trend.image,
+                                model = credManager.getProfilePic()
+                                    ?: "https://img.freepik.com/free-vector/illustration-businessman_53876-5856.jpg?w=1060&t=st=1706636886~exp=1706637486~hmac=cd845268ac16219ea6e0c908a80c08b399419c0233e51a6eb97022e7ef0167d3",
                                 contentDescription = "Latest Image",
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxWidth().height(500.dp),
+                                modifier = Modifier
+                                    .size(55.dp)
+                                    .clip(CircleShape)
+                                    .shadow(10.dp),
                                 loading = { CircularProgressIndicator() },
                                 error = {
                                     Image(
@@ -140,67 +278,10 @@ fun HomeScreen(
                                     )
                                 },
                             )
-
-
                         }
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight(0.5f), contentAlignment = Alignment.BottomCenter
 
-                        ) {
-                            Column(modifier = Modifier.padding(bottom = 10.dp)) {
-                                /*      Row(
-                                          modifier = Modifier
-                                              .fillMaxWidth()
-                                              .padding(horizontal = 20.dp),
-                                          horizontalArrangement = Arrangement.SpaceBetween,
-                                      ) {
-                                          for (it in if (trend.genres.isEmpty()) genres.toList() else {
-                                              if (trend.genres.size > 5) trend.genres.subList(0, 5)
-                                                  .toList() else trend.genres.toList()
-                                          }) {
-                                              Text(
-                                                  text = it,
-                                                  fontWeight = FontWeight.Bold,
-                                                  color = Color.White
-                                              )
-                                          }
-                                      }*/
-                                Text(
-                                    text = trend.title,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White,
-                                    fontSize = 24.sp,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                                Spacer(modifier = Modifier.height(20.dp))
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 10.dp),
-                                    horizontalArrangement = Arrangement.SpaceAround
-                                ) {
-                                    ListButton() {
-                                        //TODO LIST ADD FUNCTIONALITY
-                                    }
-                                    PlayButton(
-                                        textModifier = Modifier.padding(horizontal = 9.dp),
-                                        modifier = Modifier.clip(
-                                            RoundedCornerShape(50)
-                                        )
-                                    ) {
-                                        //TODO Play FUNCTIONALITY
-                                    }
-                                    InfoButton {
-                                        //TODO Info FUNCTIONALITY
-                                    }
-                                }
-                            }
-
-                        }
                     }
+
                 }
             }
         }
@@ -322,7 +403,7 @@ fun HomeScreen(
         }
 
         item {
-            when(trendingState){
+            when (trendingState) {
                 is DashboardViewModel.AiringUIEvent.Failure -> {}
                 DashboardViewModel.AiringUIEvent.Loading -> {}
                 is DashboardViewModel.AiringUIEvent.Success -> {
@@ -366,12 +447,17 @@ fun HomeScreen(
             )
         }
         item {
-            when(completedAnimeData){
+            when (completedAnimeData) {
                 is DashboardViewModel.CompletedAnimeUIEvent.Failure -> {}
                 DashboardViewModel.CompletedAnimeUIEvent.Loading -> {}
                 is DashboardViewModel.CompletedAnimeUIEvent.Success -> {
-                    val result = (completedAnimeData as DashboardViewModel.CompletedAnimeUIEvent.Success)
-                    Column(modifier = Modifier.fillMaxWidth()) {
+                    val result =
+                        (completedAnimeData as DashboardViewModel.CompletedAnimeUIEvent.Success)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 20.dp)
+                    ) {
                         LazyRow(content = {
                             items(result.data.results) { it ->
                                 AnimeCard(

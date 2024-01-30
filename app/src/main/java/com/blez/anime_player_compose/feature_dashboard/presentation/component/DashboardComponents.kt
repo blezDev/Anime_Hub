@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -52,7 +53,7 @@ fun ListButton(
     plusIconColor: Color = Color.White,
     onClicked: () -> Unit
 ) {
-    Column(modifier = modifier.clickable {
+    Column(modifier = modifier.shadow(10.dp).clickable {
         onClicked()
     }) {
         Image(
@@ -106,7 +107,7 @@ fun InfoButton(
     infoIconColor: Color = Color.White,
     onClicked: () -> Unit
 ) {
-    Column(modifier = modifier.clickable {
+    Column(modifier = modifier.shadow(10.dp).clickable {
         onClicked()
     }) {
         Image(

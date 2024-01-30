@@ -9,5 +9,5 @@ import retrofit2.http.Query
 interface WatchAPI {
 
     @GET("/anime/zoro/watch")
-    suspend fun getTopAiring(@Query("episodeId") episodeId: String): Response<VideoModel>
+    suspend fun getVideoLink(@Query("episodeId") episodeId: String): Response<VideoModel>
 }
