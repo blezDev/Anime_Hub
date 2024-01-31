@@ -30,6 +30,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,7 +79,8 @@ fun HomeScreen(
     backgroundColor: Color = Color(24, 18, 43),
     dashboardViewModel: DashboardViewModel = hiltViewModel(),
     navController: NavHostController,
-    window: Window
+    window: Window,
+    drawerState: DrawerState
 ) {
     window.setFlags(
         WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
@@ -269,7 +271,10 @@ fun HomeScreen(
                                 modifier = Modifier
                                     .size(55.dp)
                                     .clip(CircleShape)
-                                    .shadow(10.dp),
+                                    .shadow(10.dp)
+                                    .clickable {
+
+                                    },
                                 loading = { CircularProgressIndicator() },
                                 error = {
                                     Image(
