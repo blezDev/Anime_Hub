@@ -137,8 +137,8 @@ fun AnimeCard(
     imageUrl: String,
     title: String,
     episodeNumber: String,
-    episodeId: String,
-    animeId: String,
+    episodeId: String? ="",
+    animeId: String? ="",
     onClicked: () -> Unit,
     textColor: Color = Color.Black,
 ) {

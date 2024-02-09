@@ -6,6 +6,6 @@ data class DashboardUseCases(
     val recentReleaseUseCase: RecentReleaseUseCase,
     val topAiringUseCase: TopAiringUseCase,
     val infoDetails: InfoDetails,
-    val recentAddedUseCase: RecentAddedUseCase,
-    val completedAnimeUseCase: CompletedAnimeUseCase
+    val moviesAddedUseCase: MoviesAddedUseCase,
+    val popularAnimeUseCase: PopularAnimeUseCase
 )

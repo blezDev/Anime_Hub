@@ -2,6 +2,8 @@ package com.blez.anime_player_compose.feature_dashboard.data.remote
 
 import com.blez.anime_player_compose.feature_dashboard.domain.model.AnimeDetails
 import com.blez.anime_player_compose.feature_dashboard.domain.model.GoogleProfileModel
+import com.blez.anime_player_compose.feature_dashboard.domain.model.MovieModel
+import com.blez.anime_player_compose.feature_dashboard.domain.model.PopularAnimeModel
 import com.blez.anime_player_compose.feature_dashboard.domain.model.Recent_Release_Model
 import com.blez.anime_player_compose.feature_dashboard.domain.model.SearchDataModel
 import com.blez.anime_player_compose.feature_dashboard.domain.model.Top_Airing
@@ -12,17 +14,17 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface DashboardAPI {
-    @GET("/anime/zoro/recent-episodes")
+    @GET("/anime/gogoanime/recent-episodes")
     suspend fun getRecentRelease(@Query("page") page: Int): Response<ZoroModel>
 
-    @GET("/anime/zoro/recent-added")
-    suspend fun getRecentAdded(@Query("page") page: Int): Response<ZoroModel>
+    @GET("/anime/gogoanime/popular")
+    suspend fun getPopular(@Query("page") page: Int): Response<PopularAnimeModel>
 
-    @GET("/anime/zoro/latest-completed")
-    suspend fun getCompletedAnime(@Query("page") page: Int): Response<ZoroModel>
+    @GET("/anime/gogoanime/movies")
+    suspend fun getMovies(@Query("page") page: Int): Response<MovieModel>
 
 
-    @GET("/anime/zoro/top-airing")
+    @GET("/anime/gogoanime/top-airing")
     suspend fun getTopAiring(@Query("page") page: Int) : Response<Top_Airing>
 
 

@@ -63,6 +63,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.blez.anime_player_compose.R
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.EpisodeCard
 import com.blez.anime_player_compose.feature_detail_info.domain.model.Episode
+import com.blez.anime_player_compose.feature_detail_info.domain.model.Gogoanime_Episode
 import com.blez.anime_player_compose.feature_detail_info.presentation.components.ExpandableText
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.launch
@@ -125,7 +126,7 @@ fun DetailScreen(
 
             val description = data.description
             val textColor = Color.White
-            val otherName = otherName
+            val otherName = data.otherName
             val subOrDub = data.subOrDub
             val episodes = data.episodes
 
@@ -457,7 +458,7 @@ fun DetailScreen(
 
 }
 
-fun LazyListScope.EpisodeCards(episodes: List<Episode>, navController: NavHostController,image:String){
+fun LazyListScope.EpisodeCards(episodes: List<Gogoanime_Episode>, navController: NavHostController, image:String){
     items(episodes.toList()) {
         EpisodeCard(
             modifier = Modifier.padding(5.dp),
@@ -465,8 +466,8 @@ fun LazyListScope.EpisodeCards(episodes: List<Episode>, navController: NavHostCo
             episodeNumber = it.number.toString(),
             episodeUrl = it.url,
             imageUrl = image,
-            title = it.title,
-            isFiller = it.isFiller
+            title = "",
+            isFiller = false
         )
     }
 }

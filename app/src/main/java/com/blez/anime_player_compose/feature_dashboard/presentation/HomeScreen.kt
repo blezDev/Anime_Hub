@@ -3,13 +3,11 @@ package com.blez.anime_player_compose.feature_dashboard.presentation
 import android.util.Log
 import android.view.Window
 import android.view.WindowManager
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -19,11 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -64,14 +58,10 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.blez.anime_player_compose.R
 import com.blez.anime_player_compose.common.util.CredManager
 import com.blez.anime_player_compose.common.util.Screen
-import com.blez.anime_player_compose.feature_dashboard.domain.model.Result
-import com.blez.anime_player_compose.feature_dashboard.domain.model.Zoro_Result
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.AnimeCard
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.InfoButton
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.ListButton
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.PlayButton
-import com.blez.anime_player_compose.feature_dashboard.presentation.component.VerticalGrid
-
 
 
 @Composable
@@ -97,8 +87,8 @@ fun HomeScreen(
     DisposableEffect(Unit) {
         dashboardViewModel.fetchRecentRelease()
         dashboardViewModel.fetchTopAiring()
-        dashboardViewModel.fetchRecentAdded()
-        dashboardViewModel.fetchCompletedAnime()
+        dashboardViewModel.fetchPopular()
+        dashboardViewModel.fetchMovies()
         onDispose {}
     }
     val state by dashboardViewModel.fetchState.collectAsState()
@@ -157,7 +147,7 @@ fun HomeScreen(
                                             navController.navigate(
                                                 Screen.DetailScreen.passAnimeId(
                                                     trend.id,
-                                                    trend.japaneseTitle
+                                                    trend.title
                                                 )
                                             )
                                         },
@@ -322,15 +312,15 @@ fun HomeScreen(
                                     modifier = Modifier.padding(5.dp),
                                     imageUrl = it.image,
                                     title = it.title,
-                                    episodeNumber = it.sub.toString(),
-                                    episodeId = it.duration,
+                                    episodeNumber = it.episodeNumber.toString(),
+                                    episodeId = it.episodeId,
                                     animeId = it.id,
                                     textColor = Color.White,
                                     onClicked = {
                                         navController.navigate(
                                             route = Screen.DetailScreen.passAnimeId(
                                                 it.id,
-                                                it.japaneseTitle
+                                                it.title
                                             )
                                         )
                                     }
@@ -347,7 +337,7 @@ fun HomeScreen(
         item {
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = stringResource(R.string.recent_added),
+                text = stringResource(R.string.popular_anime),
                 color = Color.White,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
@@ -357,37 +347,39 @@ fun HomeScreen(
         }
         item {
             when (recentData) {
-                is DashboardViewModel.RecentAddedUIEvent.Failure -> {
+                is DashboardViewModel.PopularUIEvent.Failure -> {
 
                 }
 
-                DashboardViewModel.RecentAddedUIEvent.Loading -> {
+                DashboardViewModel.PopularUIEvent.Loading -> {
 
                 }
 
-                is DashboardViewModel.RecentAddedUIEvent.Success -> {
-                    val result = (recentData as DashboardViewModel.RecentAddedUIEvent.Success)
+                is DashboardViewModel.PopularUIEvent.Success -> {
+                    val result = (recentData as DashboardViewModel.PopularUIEvent.Success)
 
                     Column(modifier = Modifier.fillMaxWidth()) {
                         LazyRow(content = {
-                            items(result.data.results) { it ->
-                                AnimeCard(
-                                    modifier = Modifier.padding(5.dp),
-                                    imageUrl = it.image,
-                                    title = it.title,
-                                    episodeNumber = it.type,
-                                    episodeId = it.duration,
-                                    animeId = it.id,
-                                    textColor = Color.White,
-                                    onClicked = {
-                                        navController.navigate(
-                                            route = Screen.DetailScreen.passAnimeId(
-                                                it.id,
-                                                it.japaneseTitle
+                            result.data?.let {
+                                items(it.results) { it ->
+                                    AnimeCard(
+                                        modifier = Modifier.padding(5.dp),
+                                        imageUrl = it.image,
+                                        title = it.title,
+                                        episodeNumber = it.releaseDate.toString(),
+                                        episodeId = it.releaseDate,
+                                        animeId = it.id,
+                                        textColor = Color.White,
+                                        onClicked = {
+                                            navController.navigate(
+                                                route = Screen.DetailScreen.passAnimeId(
+                                                    it.id,
+                                                    it.title
+                                                )
                                             )
-                                        )
-                                    }
-                                )
+                                        }
+                                    )
+                                }
                             }
                         })
                     }
@@ -420,15 +412,15 @@ fun HomeScreen(
                                     modifier = Modifier.padding(5.dp),
                                     imageUrl = it.image,
                                     title = it.title,
-                                    episodeNumber = it.type,
-                                    episodeId = it.duration,
+                                    episodeNumber = it.episodeNumber.toString(),
+                                    episodeId = it.episodeId,
                                     animeId = it.id,
                                     textColor = Color.White,
                                     onClicked = {
                                         navController.navigate(
                                             route = Screen.DetailScreen.passAnimeId(
                                                 it.id,
-                                                it.japaneseTitle
+                                                it.title
                                             )
                                         )
                                     }
@@ -443,7 +435,7 @@ fun HomeScreen(
         item {
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = stringResource(R.string.completed_anime),
+                text = stringResource(R.string.movies),
                 color = Color.White,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
@@ -453,35 +445,37 @@ fun HomeScreen(
         }
         item {
             when (completedAnimeData) {
-                is DashboardViewModel.CompletedAnimeUIEvent.Failure -> {}
-                DashboardViewModel.CompletedAnimeUIEvent.Loading -> {}
-                is DashboardViewModel.CompletedAnimeUIEvent.Success -> {
+                is DashboardViewModel.MovieAnimeUIEvent.Failure -> {}
+                DashboardViewModel.MovieAnimeUIEvent.Loading -> {}
+                is DashboardViewModel.MovieAnimeUIEvent.Success -> {
                     val result =
-                        (completedAnimeData as DashboardViewModel.CompletedAnimeUIEvent.Success)
+                        (completedAnimeData as DashboardViewModel.MovieAnimeUIEvent.Success)
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 20.dp)
                     ) {
                         LazyRow(content = {
-                            items(result.data.results) { it ->
-                                AnimeCard(
-                                    modifier = Modifier.padding(5.dp),
-                                    imageUrl = it.image,
-                                    title = it.title,
-                                    episodeNumber = it.episodes.toString(),
-                                    episodeId = it.duration,
-                                    animeId = it.id,
-                                    textColor = Color.White,
-                                    onClicked = {
-                                        navController.navigate(
-                                            route = Screen.DetailScreen.passAnimeId(
-                                                it.id,
-                                                it.japaneseTitle
+                            result.data?.let {
+                                items(it.results) { it ->
+                                    AnimeCard(
+                                        modifier = Modifier.padding(5.dp),
+                                        imageUrl = it.image,
+                                        title = it.title,
+                                        episodeNumber = it.releaseDate.toString(),
+                                        episodeId = it.releaseDate,
+                                        animeId = it.id,
+                                        textColor = Color.White,
+                                        onClicked = {
+                                            navController.navigate(
+                                                route = Screen.DetailScreen.passAnimeId(
+                                                    it.id,
+                                                    it.title
+                                                )
                                             )
-                                        )
-                                    }
-                                )
+                                        }
+                                    )
+                                }
                             }
                         })
                     }
@@ -494,27 +488,27 @@ fun HomeScreen(
 }
 
 
-fun LazyListScope.AnimeCards(results: List<Zoro_Result>, navController: NavHostController) {
+/*fun LazyListScope.AnimeCards(results: List<GogoAnime_Result>, navController: NavHostController) {
     items(results.size) {
         AnimeCard(
             modifier = Modifier.padding(2.dp),
             imageUrl = results[it].image,
             title = results[it].title,
-            episodeNumber = results[it].sub.toString(),
-            episodeId = results[it].duration,
+            episodeNumber = results[it].episodeNumber.toString(),
+            episodeId = results[it].episodeId,
             animeId = results[it].id,
             textColor = Color.White,
             onClicked = {
                 navController.navigate(
                     route = Screen.DetailScreen.passAnimeId(
                         results[it].id,
-                        results[it].japaneseTitle
+                        results[it].title
                     )
                 )
             }
         )
     }
-}
+}*/
 
 
 

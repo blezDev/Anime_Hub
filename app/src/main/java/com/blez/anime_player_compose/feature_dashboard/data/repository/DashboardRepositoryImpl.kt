@@ -6,6 +6,8 @@ import com.blez.anime_player_compose.common.util.ResultState
 import com.blez.anime_player_compose.common.util.RunningCache
 import com.blez.anime_player_compose.common.util.checkForInternetConnection
 import com.blez.anime_player_compose.feature_dashboard.data.remote.DashboardAPI
+import com.blez.anime_player_compose.feature_dashboard.domain.model.MovieModel
+import com.blez.anime_player_compose.feature_dashboard.domain.model.PopularAnimeModel
 import com.blez.anime_player_compose.feature_dashboard.domain.model.Recent_Release_Model
 import com.blez.anime_player_compose.feature_dashboard.domain.model.Top_Airing
 import com.blez.anime_player_compose.feature_dashboard.domain.model.ZoroModel
@@ -44,15 +46,15 @@ class DashboardRepositoryImpl(
         return ResultState.Error("Something went wrong")
     }
 
-    override suspend fun getRecentAdded(page: Int): ResultState<ZoroModel> {
-        val cache = RunningCache.recentAddedCache
+    override suspend fun getPopularAnime(page: Int): ResultState<PopularAnimeModel> {
+        val cache = RunningCache.popularCache
         if (!context.checkForInternetConnection()){
             return ResultState.Error("Couldn\'t reach server. Check your internet connection.")
         }
         if (cache[page] !=null){
             return ResultState.Success(data = cache[page])
         }
-        val result = dashboardAPI.getRecentAdded(page)
+        val result = dashboardAPI.getPopular(page)
 
         if (result.code()==200 && result.body() != null){
             return ResultState.Success(data = result.body())
@@ -61,15 +63,15 @@ class DashboardRepositoryImpl(
 
     }
 
-    override suspend fun getCompletedAnime(page: Int): ResultState<ZoroModel> {
-        val cache = RunningCache.completedAnimeCache
+    override suspend fun getMoviesAnime(page: Int): ResultState<MovieModel> {
+        val cache = RunningCache.moviesAnimeCache
         if (!context.checkForInternetConnection()){
             return ResultState.Error("Couldn\'t reach server. Check your internet connection.")
         }
         if (cache[page] !=null){
             return ResultState.Success(data = cache[page])
         }
-        val result = dashboardAPI.getCompletedAnime(page)
+        val result = dashboardAPI.getMovies(page)
 
         if (result.code()==200 && result.body() != null){
             return ResultState.Success(data = result.body())

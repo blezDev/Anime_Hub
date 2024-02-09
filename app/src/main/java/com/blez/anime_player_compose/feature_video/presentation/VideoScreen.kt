@@ -1,26 +1,56 @@
 package com.blez.anime_player_compose.feature_video.presentation
 
 import android.app.ActionBar
+import android.net.Uri
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
+import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.annotation.OptIn
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat.getString
 import androidx.core.view.WindowCompat
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaItem.SubtitleConfiguration
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.MimeTypes
+import androidx.media3.common.Player
+import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.ui.AspectRatioFrameLayout
+import androidx.media3.ui.PlayerView
 import androidx.navigation.NavHostController
 import com.blez.anime_player_compose.R
+import com.blez.anime_player_compose.common.util.Constants.PLAYER_SEEK_BACK_INCREMENT
+import com.blez.anime_player_compose.common.util.Constants.PLAYER_SEEK_FORWARD_INCREMENT
+import com.blez.anime_player_compose.feature_video.domain.model.Headers
 import com.blez.anime_player_compose.feature_video.domain.model.Intro
 import com.blez.anime_player_compose.feature_video.domain.model.Source
 import com.blez.anime_player_compose.feature_video.domain.model.Subtitle
@@ -30,6 +60,7 @@ import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.launch
 
 
+@kotlin.OptIn(ExperimentalAnimationApi::class)
 @OptIn(UnstableApi::class)
 @Composable
 fun VideoScreen(
@@ -68,25 +99,49 @@ fun VideoScreen(
     }
 
 
+    val result = VideoModel(
+        download = "https://gogohd.net/download?id=MjE4NTQz&token=Tc_lksdkzYBdEkXkXhp-pA&expires=1707516216",
+        headers = Headers("https://embtaku.pro/embedplus?id=MjE4NTQz&token=Tc_lksdkzYBdEkXkXhp-pA&expires=1707516216"),
+        sources = listOf(Source(url = "https://www109.vipanicdn.net/streamhls/65be8eec9685db8f181d58395efb8597/ep.1.1704567536.360.m3u8", isM3U8 = true, quality = "360p"))
+    )
+    val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
+        .setUserAgent(context.getString(R.string.app_name))
+        .setConnectTimeoutMs(DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS)
+        .setReadTimeoutMs(1800000)
+        .setAllowCrossProtocolRedirects(true)
+
+    dataSourceFactory.createDataSource()
 
 
+    //val mediaItem = MediaItem.fromUri("https://www081.vipanicdn.net/streamhls/9701aab79df62c91ccc6614ac056c3e3/ep.1.1704382353.m3u8")
 
+
+    val mediaItem = MediaItem.Builder()
+        .setUri("https://www109.vipanicdn.net/streamhls/65be8eec9685db8f181d58395efb8597/ep.1.1704567536.1080.m3u8")
+        .build()
+
+    val mediaSource: MediaSource =
+        HlsMediaSource.Factory(dataSourceFactory)
+            .createMediaSource(mediaItem)
 
 
     val exoPlayer = remember {
         ExoPlayer.Builder(context)
             .apply {
-                setSeekBackIncrementMs(5000)
-                setSeekForwardIncrementMs(5000)
+                setSeekBackIncrementMs(PLAYER_SEEK_BACK_INCREMENT)
+                setSeekForwardIncrementMs(PLAYER_SEEK_FORWARD_INCREMENT)
+
             }
             .build()
             .apply {
-                //TODO
+                setMediaItem(mediaItem)
+                setMediaSource(mediaSource)
+                prepare()
+                playWhenReady = true
             }
     }
 
-
-    var shouldShowControls by remember { mutableStateOf(true) }
+    var shouldShowControls by remember { mutableStateOf(false) }
 
     var isPlaying by remember { mutableStateOf(exoPlayer.isPlaying) }
 
@@ -98,39 +153,103 @@ fun VideoScreen(
 
     var playbackState by remember { mutableStateOf(exoPlayer.playbackState) }
 
+    Box(modifier = Modifier) {
+        DisposableEffect(key1 = Unit) {
+            val listener =
+                object : Player.Listener {
+                    override fun onEvents(
+                        player: Player,
+                        events: Player.Events
+                    ) {
+                        super.onEvents(player, events)
+                        totalDuration = player.duration.coerceAtLeast(0L)
+                        currentTime = player.currentPosition.coerceAtLeast(0L)
+                        bufferedPercentage = player.bufferedPercentage
+                        isPlaying = player.isPlaying
+                        playbackState = player.playbackState
+                    }
+                }
 
-    val result = VideoModel(
-        Intro(
-            start = 55, end = 144
-        ),
-        sources = listOf(
-            Source(
-                url = "https://ec.netmagcdn.com:2228/hls-playback/f3dc9dd0b43d6219654b8501df3f906339ae8da5f595b9bba63f35016dfa04f34134f118ee82a085aa997fea5ead00f68ab9027d5cd2cc7cf441f84a88990be850051f5a2448dab7f4677114d0dd6bbcd5534329d6ce23c213df600c258d78cdebb25907876ace508df7d7d7bbae31a44e7151f62009c88c80b86df681f1baed96976206c3bee01d69923892699a4b40/master.m3u8",
-                isM3U8 = true
-            ), Source(
-                url = "https://ec.netmagcdn.com:2228/hls-playback/f3dc9dd0b43d6219654b8501df3f906339ae8da5f595b9bba63f35016dfa04f34134f118ee82a085aa997fea5ead00f68ab9027d5cd2cc7cf441f84a88990be850051f5a2448dab7f4677114d0dd6bbcd5534329d6ce23c213df600c258d78cdebb25907876ace508df7d7d7bbae31a44e7151f62009c88c80b86df681f1baed96976206c3bee01d69923892699a4b40/master.m3u8",
-                isM3U8 = true,
-                quality = "auto"
-            )
-        ), subtitles = listOf(
-            Subtitle(
-                lang = "English",
-                url = "https://r.scstatics.com/media/cc/ce5bfc5345b69ebbbeb7a85c294537e8/2-gne.vtt"
-            ), Subtitle(
-                lang = "Thumbnails",
-                url = "https://imgb.megaresources.co/_a_preview/c6/c609ac116a3e264e17b51b611b1dc06d/thumbnails/sprite.vtt"
-            )
+            exoPlayer.addListener(listener)
+
+
+            onDispose {
+                exoPlayer.removeListener(listener)
+                exoPlayer.release()
+            }
+        }
+
+
+        val aspectRatio = listOf(AspectRatioFrameLayout.RESIZE_MODE_FIT,AspectRatioFrameLayout.RESIZE_MODE_FILL)
+
+       var aspect by remember {
+           mutableStateOf(AspectRatioFrameLayout.RESIZE_MODE_FILL)
+       }
+
+        AndroidView(
+            modifier = Modifier.clickable {
+                shouldShowControls = shouldShowControls.not()
+            },
+            factory = {
+                PlayerView(context).apply {
+                    player = exoPlayer
+                    useController = false
+                    setShowSubtitleButton(true)
+                    resizeMode = aspect
+                    layoutParams = FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+                }
+            })
+
+
+
+
+
+        PlayerController(
+            title = title,
+            navHostController = navController,
+            onBackPressed = {
+
+            },
+            isSubtitleEnabled = {
+
+                if (aspect == AspectRatioFrameLayout.RESIZE_MODE_FIT){
+                    aspect = AspectRatioFrameLayout.RESIZE_MODE_FILL
+
+                }else{
+                    AspectRatioFrameLayout.RESIZE_MODE_FIT
+                }
+            },
+            isVisible = { shouldShowControls },
+            currentTime = { currentTime },
+            startTime = { 0L },
+            onPausedClicked = {
+                if (it) {
+                    exoPlayer.pause()
+                } else {
+                    exoPlayer.play()
+                }
+            },
+            endTime = { totalDuration },
+            bufferedPercentage = { bufferedPercentage },
+            onSeekChanged = { timeMs: Float ->
+                exoPlayer.seekTo(timeMs.toLong())
+            },
+            onForwardClicked = {
+                exoPlayer.seekForward()
+            },
+            onBackwardClicked = {
+                exoPlayer.seekBack()
+            },
+
         )
-    )
-    PlayerController(
-        title = title,
-        navHostController = navController,
-        onBackPressed = {
+        LaunchedEffect(key1 = exoPlayer.duration) {
+            Log.e("TAG", exoPlayer.contentDuration.toString())
+        }
 
-        },
-        isSubtitleEnabled = {
 
-        })
-
+    }
 }
 

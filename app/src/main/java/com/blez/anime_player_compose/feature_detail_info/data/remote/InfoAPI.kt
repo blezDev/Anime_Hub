@@ -8,6 +8,6 @@ import retrofit2.http.Query
 
 interface InfoAPI {
 
-    @GET("/anime/zoro/info")
-    suspend fun getAnimeInfo(@Query("id") animeId : String) : Response<AnimeInfoModel>
+    @GET("/anime/gogoanime/info/{info}")
+    suspend fun getAnimeInfo(@Path("info") animeId : String) : Response<AnimeInfoModel>
 }

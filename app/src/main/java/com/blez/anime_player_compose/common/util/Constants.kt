@@ -14,4 +14,10 @@ object Constants {
     const val USER_FAMILY_NAME = "USER_FAMILY_NAME"
 
 
+
+    //Video Player Constants
+     const val PLAYER_SEEK_BACK_INCREMENT = 5 * 1000L // 5 seconds
+     const val PLAYER_SEEK_FORWARD_INCREMENT = 5 * 1000L // 5 seconds
+
+
 }

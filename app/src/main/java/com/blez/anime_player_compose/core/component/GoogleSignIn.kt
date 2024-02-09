@@ -79,6 +79,11 @@ fun GoogleButton(
             Text(text = if (clicked) loadingText else text)
             if (clicked) {
                 Spacer(modifier = Modifier.width(16.dp))
+//                CircularProgressIndicator(    modifier = Modifier
+//                    .height(16.dp)
+//                    .width(16.dp),
+//                    strokeWidth = 2.dp,
+//                    color = progressIndicatorColor)
                 CircularProgressIndicator(
                     modifier = Modifier
                         .height(16.dp)
@@ -86,6 +91,7 @@ fun GoogleButton(
                     strokeWidth = 2.dp,
                     color = progressIndicatorColor
                 )
+
             }
 
         }

@@ -1,20 +1,15 @@
 package com.blez.anime_player_compose.feature_dashboard.presentation
 
-import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blez.anime_player_compose.common.util.ResultState
-import com.blez.anime_player_compose.feature_dashboard.domain.model.Recent_Release_Model
-import com.blez.anime_player_compose.feature_dashboard.domain.model.Result
+import com.blez.anime_player_compose.feature_dashboard.domain.model.MovieModel
+import com.blez.anime_player_compose.feature_dashboard.domain.model.PopularAnimeModel
 import com.blez.anime_player_compose.feature_dashboard.domain.model.Top_Airing
 import com.blez.anime_player_compose.feature_dashboard.domain.model.ZoroModel
 import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.DashboardUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -37,16 +32,16 @@ class DashboardViewModel @Inject constructor(val dashboardUseCases: DashboardUse
         data class Failure(val message: String) : AiringUIEvent()
     }
 
-    sealed class RecentAddedUIEvent {
-        data object Loading : RecentAddedUIEvent()
-        data class Success(val data: ZoroModel) : RecentAddedUIEvent()
-        data class Failure(val message: String) : RecentAddedUIEvent()
+    sealed class PopularUIEvent {
+        data object Loading : PopularUIEvent()
+        data class Success(val data: PopularAnimeModel?) : PopularUIEvent()
+        data class Failure(val message: String) : PopularUIEvent()
     }
 
-    sealed class CompletedAnimeUIEvent {
-        data object Loading : CompletedAnimeUIEvent()
-        data class Success(val data: ZoroModel) : CompletedAnimeUIEvent()
-        data class Failure(val message: String) : CompletedAnimeUIEvent()
+    sealed class MovieAnimeUIEvent {
+        data object Loading : MovieAnimeUIEvent()
+        data class Success(val data: MovieModel?) : MovieAnimeUIEvent()
+        data class Failure(val message: String) : MovieAnimeUIEvent()
 
     }
 
@@ -59,13 +54,13 @@ class DashboardViewModel @Inject constructor(val dashboardUseCases: DashboardUse
         get() = _topAiringState
 
 
-    private val _fetchRecentAdded = MutableStateFlow<RecentAddedUIEvent>(RecentAddedUIEvent.Loading)
-    val fetchRecentAdded: StateFlow<RecentAddedUIEvent>
+    private val _fetchRecentAdded = MutableStateFlow<PopularUIEvent>(PopularUIEvent.Loading)
+    val fetchRecentAdded: StateFlow<PopularUIEvent>
         get() = _fetchRecentAdded
 
     private val _fetchCompletedAnime =
-        MutableStateFlow<CompletedAnimeUIEvent>(CompletedAnimeUIEvent.Loading)
-    val fetchCompletedAnime: StateFlow<CompletedAnimeUIEvent>
+        MutableStateFlow<MovieAnimeUIEvent>(MovieAnimeUIEvent.Loading)
+    val fetchCompletedAnime: StateFlow<MovieAnimeUIEvent>
         get() = _fetchCompletedAnime
 
     fun fetchTopAiring(page: Int = 1) {
@@ -113,45 +108,45 @@ class DashboardViewModel @Inject constructor(val dashboardUseCases: DashboardUse
     }
 
 
-    fun fetchRecentAdded(page: Int = 1) {
+    fun fetchPopular(page: Int = 1) {
         viewModelScope.launch {
-            when (val result = dashboardUseCases.recentAddedUseCase(page)) {
+            when (val result = dashboardUseCases.popularAnimeUseCase(page)) {
                 is ResultState.Error -> {
-                    _fetchRecentAdded.emit(RecentAddedUIEvent.Failure(result.message.toString()))
+                    _fetchRecentAdded.emit(PopularUIEvent.Failure(result.message.toString()))
                 }
 
                 is ResultState.Loading -> {
-                    _fetchRecentAdded.emit(RecentAddedUIEvent.Loading)
+                    _fetchRecentAdded.emit(PopularUIEvent.Loading)
                 }
 
                 is ResultState.Success -> {
 
                     if (result.data != null)
-                        _fetchRecentAdded.emit(RecentAddedUIEvent.Success(result.data))
+                        _fetchRecentAdded.emit(PopularUIEvent.Success(result.data))
                     else
-                        _fetchRecentAdded.emit(RecentAddedUIEvent.Failure(result.message.toString()))
+                        _fetchRecentAdded.emit(PopularUIEvent.Failure(result.message.toString()))
                 }
             }
         }
     }
 
 
-    fun fetchCompletedAnime(page: Int = 1) {
+    fun fetchMovies(page: Int = 1) {
         viewModelScope.launch {
-            when (val result = dashboardUseCases.completedAnimeUseCase(page)) {
+            when (val result = dashboardUseCases.moviesAddedUseCase(page)) {
                 is ResultState.Error -> {
-                    _fetchCompletedAnime.emit(CompletedAnimeUIEvent.Failure(result.message.toString()))
+                    _fetchCompletedAnime.emit(MovieAnimeUIEvent.Failure(result.message.toString()))
                 }
 
                 is ResultState.Loading -> {
-                    _fetchCompletedAnime.emit(CompletedAnimeUIEvent.Loading)
+                    _fetchCompletedAnime.emit(MovieAnimeUIEvent.Loading)
                 }
 
                 is ResultState.Success -> {
                     if (result.data != null)
-                        _fetchCompletedAnime.emit(CompletedAnimeUIEvent.Success(result.data))
+                        _fetchCompletedAnime.emit(MovieAnimeUIEvent.Success(result.data))
                     else
-                        _fetchCompletedAnime.emit(CompletedAnimeUIEvent.Failure(result.message.toString()))
+                        _fetchCompletedAnime.emit(MovieAnimeUIEvent.Failure(result.message.toString()))
                 }
             }
         }

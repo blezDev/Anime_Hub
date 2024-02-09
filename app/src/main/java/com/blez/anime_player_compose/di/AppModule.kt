@@ -5,9 +5,9 @@ import com.blez.anime_player_compose.common.util.Constants
 import com.blez.anime_player_compose.feature_dashboard.data.remote.DashboardAPI
 import com.blez.anime_player_compose.feature_dashboard.data.repository.DashboardRepositoryImpl
 import com.blez.anime_player_compose.feature_dashboard.domain.repository.DashboardRepository
-import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.CompletedAnimeUseCase
 import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.DashboardUseCases
-import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.RecentAddedUseCase
+import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.MoviesAddedUseCase
+import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.PopularAnimeUseCase
 import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.RecentReleaseUseCase
 import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.TopAiringUseCase
 import com.blez.anime_player_compose.feature_detail_info.data.remote.InfoAPI
@@ -112,14 +112,14 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providesRecentAddedUseCase(repository: DashboardRepository): RecentAddedUseCase {
-        return RecentAddedUseCase(repository)
+    fun providesRecentAddedUseCase(repository: DashboardRepository): MoviesAddedUseCase {
+        return MoviesAddedUseCase(repository)
     }
 
     @Singleton
     @Provides
-    fun providesCompletedAnimeUseCase(repository: DashboardRepository): CompletedAnimeUseCase {
-        return CompletedAnimeUseCase(repository)
+    fun providesCompletedAnimeUseCase(repository: DashboardRepository): PopularAnimeUseCase {
+        return PopularAnimeUseCase(repository)
     }
 
     @Singleton
@@ -128,15 +128,15 @@ object AppModule {
         releaseUseCase: RecentReleaseUseCase,
         topAiringUseCase: TopAiringUseCase,
         infoDetails: InfoDetails,
-        recentAddedUseCase: RecentAddedUseCase,
-        completedAnimeUseCase: CompletedAnimeUseCase
+        moviesAddedUseCase: MoviesAddedUseCase,
+        popularAnimeUseCase: PopularAnimeUseCase
     ): DashboardUseCases {
         return DashboardUseCases(
             releaseUseCase,
             topAiringUseCase,
             infoDetails,
-            recentAddedUseCase,
-            completedAnimeUseCase
+            moviesAddedUseCase,
+            popularAnimeUseCase
         )
     }
 
