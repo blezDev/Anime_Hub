@@ -205,8 +205,6 @@ fun VideoScreen(
 
 
 
-
-
         PlayerController(
             title = title,
             navHostController = navController,
