@@ -6,6 +6,7 @@ import com.blez.anime_player_compose.feature_dashboard.domain.model.Recent_Relea
 import com.blez.anime_player_compose.feature_dashboard.domain.model.Top_Airing
 import com.blez.anime_player_compose.feature_dashboard.domain.model.ZoroModel
 import com.blez.anime_player_compose.feature_detail_info.domain.model.AnimeInfoModel
+import com.blez.anime_player_compose.feature_video.domain.model.VideoModel
 
 object RunningCache {
     val recentReleaseCache = mutableMapOf<Int, ZoroModel>()
@@ -13,4 +14,5 @@ object RunningCache {
     val moviesAnimeCache = mutableMapOf<Int, MovieModel>()
     val topAiringCache = mutableMapOf<Int, Top_Airing>()
     val animeDetails = mutableMapOf<String, AnimeInfoModel>()
+    val videoData = mutableMapOf<String,VideoModel>()
 }

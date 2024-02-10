@@ -157,20 +157,22 @@ fun AnimeCard(
                     )
                 }, contentScale = ContentScale.Crop
             )
-            Box(
-                modifier = modifier
-                    .background(Color.Black)
-                    .padding(start = 5.dp),
-                contentAlignment = Alignment.BottomStart
-            ) {
-                Text(
-                    text = episodeNumber.toString(),
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    fontSize = 28.sp,
-                    modifier = modifier.padding(5.dp)
-                )
+            if (episodeNumber.isNotEmpty()){
+                Box(
+                    modifier = modifier
+                        .background(Color.Black)
+                        .padding(start = 5.dp),
+                    contentAlignment = Alignment.BottomStart
+                ) {
+                    Text(
+                        text = episodeNumber.toString(),
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        fontSize = 28.sp,
+                        modifier = modifier.padding(5.dp)
+                    )
 
+                }
             }
         }
         val trunText = if (title.length > 25) {title.substring(0,25) + " ...."} else title

@@ -412,7 +412,7 @@ fun HomeScreen(
                                     modifier = Modifier.padding(5.dp),
                                     imageUrl = it.image,
                                     title = it.title,
-                                    episodeNumber = it.episodeNumber.toString(),
+                                    episodeNumber ="",
                                     episodeId = it.episodeId,
                                     animeId = it.id,
                                     textColor = Color.White,

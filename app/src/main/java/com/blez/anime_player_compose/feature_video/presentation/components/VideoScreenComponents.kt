@@ -37,8 +37,8 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,9 +49,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.blez.anime_player_compose.R
-import com.blez.anime_player_compose.common.util.Constants
 import com.blez.anime_player_compose.common.util.Constants.PLAYER_SEEK_BACK_INCREMENT
 import com.blez.anime_player_compose.common.util.Constants.PLAYER_SEEK_FORWARD_INCREMENT
+import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
 
 
@@ -61,6 +61,7 @@ fun PlayerController(
     modifier: Modifier = Modifier,
     isVisible: () -> Boolean,
     title: String,
+    episodeNumber : String,
     navHostController: NavHostController,
     onBackPressed: () -> Unit,
     isSubtitleEnabled: (Boolean) -> Unit,
@@ -71,7 +72,10 @@ fun PlayerController(
     onPausedClicked: (Boolean) -> Unit,
     onSeekChanged: (timeMs: Float) -> Unit,
     onForwardClicked: (Long) -> Unit,
-    onBackwardClicked: (Long) -> Unit
+    onBackwardClicked: (Long) -> Unit,
+    onMuteClicked: (Boolean) -> Unit,
+    muteState : ()-> Boolean = {false}
+
 ) {
     val visible = remember(isVisible()) { isVisible() }
     AnimatedVisibility(
@@ -91,6 +95,7 @@ fun PlayerController(
                     .fillMaxWidth()
                     .padding(16.dp),
                 title = title,
+                episodeNumber  = episodeNumber,
                 navController = navHostController,
                 onBackPressed = onBackPressed,
                 isSubtitleEnabled = isSubtitleEnabled
@@ -143,7 +148,9 @@ fun PlayerController(
                 )
                 BottomControl(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    onMuteClicked = onMuteClicked,
+                    muteState = muteState
 
                 )
             }
@@ -158,7 +165,8 @@ fun TopControl(
     title: String,
     onBackPressed: () -> Unit,
     navController: NavHostController,
-    isSubtitleEnabled: (Boolean) -> Unit
+    isSubtitleEnabled: (Boolean) -> Unit,
+    episodeNumber: String
 ) {
     var isSubtitleOn by remember {
         mutableStateOf(false)
@@ -214,6 +222,14 @@ fun TopControl(
         Row(
             modifier = Modifier, verticalAlignment = Alignment.CenterVertically
         ) {
+
+            Text(
+                modifier = Modifier,
+                text = episodeNumber,
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White
+            )
+            Spacer(modifier = Modifier.width(14.dp))
 
             if (isSubtitleOn) {
                 Icon(
@@ -290,6 +306,14 @@ fun DurationControl(
     val duration = remember(endTime()) { endTime() }
     val videoTime = remember(currentTime()) { currentTime() }
     var buffer = remember(bufferedPercentage()) { bufferedPercentage() }
+
+    var timer by remember { mutableStateOf(videoTime) }
+    LaunchedEffect(key1 = timer) {
+        if (timer > 0) {
+            delay(1_000)
+            timer = timer + 1
+        }
+    }
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround,
@@ -387,18 +411,21 @@ fun BottomControl(
     modifier: Modifier = Modifier,
     onLockedUIClicked: (Boolean) -> Unit = {},
     onMuteClicked: (Boolean) -> Unit = {},
-    onBackwardClicked: (Long) -> Unit = {},
-    onForwardClicked: (Long) -> Unit = {},
-    onPausedClicked: (Boolean) -> Unit = {},
     onQualityClicked: (String) -> Unit = {},
-    onFullScreenClicked: () -> Unit = {}
+    onFullScreenClicked: () -> Unit = {},
+    muteState : ()-> Boolean = {false}
 ) {
     var onLockedEnabled by remember {
         mutableStateOf(false)
     }
-    var onMutedEnabled by remember {
-        mutableStateOf(false)
+
+    var onMutedEnabled by remember{ mutableStateOf(false)}
+
+
+    LaunchedEffect(key1 =  muteState()){
+        onMutedEnabled = muteState()
     }
+
 
     Row(
         modifier = modifier

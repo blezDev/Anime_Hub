@@ -10,9 +10,9 @@ sealed class Screen(val route: String) {
         }
 
     }
-    data object VideoScreen : Screen("video_screen"){
-        fun passInfo(): String {
-            return "video_screen"
+    data object VideoScreen : Screen("video_screen/{episode_id}&&{title}&&{episodeNumber}"){
+        fun passInfo(episodeId : String, title : String,episodeNumber : String ): String {
+            return "video_screen/${episodeId}&&${title}&&${episodeNumber}"
         }
     }
 }

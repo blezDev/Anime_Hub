@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                         startDestination = if (credManager.getToken() == null) {
                             Screen.LoginScreen.route
                         } else {
-                            Screen.VideoScreen.route
+                            Screen.HomeScreen.route
                         },
                         window,
                         drawerState = drawerState,

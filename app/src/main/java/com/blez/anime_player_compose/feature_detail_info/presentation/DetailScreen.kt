@@ -61,6 +61,7 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.blez.anime_player_compose.R
+import com.blez.anime_player_compose.common.util.Screen
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.EpisodeCard
 import com.blez.anime_player_compose.feature_detail_info.domain.model.Episode
 import com.blez.anime_player_compose.feature_detail_info.domain.model.Gogoanime_Episode
@@ -407,7 +408,7 @@ fun DetailScreen(
 
 
                     }
-                    EpisodeCards(episodes,navController,image)
+                    EpisodeCards(episodes,navController,image,title)
               /*      item {
                         Row(
                             modifier = Modifier
@@ -458,10 +459,13 @@ fun DetailScreen(
 
 }
 
-fun LazyListScope.EpisodeCards(episodes: List<Gogoanime_Episode>, navController: NavHostController, image:String){
+fun LazyListScope.EpisodeCards(episodes: List<Gogoanime_Episode>, navController: NavHostController, image:String,title : String){
     items(episodes.toList()) {
         EpisodeCard(
-            modifier = Modifier.padding(5.dp),
+            modifier = Modifier.padding(5.dp)
+                .clickable {
+                           navController.navigate(Screen.VideoScreen.passInfo(it.id, title,"Episode : ${it.number}"))
+                },
             id = it.id,
             episodeNumber = it.number.toString(),
             episodeUrl = it.url,

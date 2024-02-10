@@ -15,6 +15,10 @@ import com.blez.anime_player_compose.feature_detail_info.data.repository.InfoRep
 import com.blez.anime_player_compose.feature_detail_info.domain.repository.InfoRepository
 import com.blez.anime_player_compose.feature_detail_info.domain.use_cases.DetailsUseCases
 import com.blez.anime_player_compose.feature_detail_info.domain.use_cases.InfoDetails
+import com.blez.anime_player_compose.feature_video.data.remote.WatchAPI
+import com.blez.anime_player_compose.feature_video.data.repository.VideoRepositoryImpl
+import com.blez.anime_player_compose.feature_video.domain.repository.VideoRepository
+import com.blez.anime_player_compose.feature_video.domain.use_cases.VideoLinksUseCases
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -79,6 +83,13 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun providesWatchAPI(retrofit: Retrofit): WatchAPI{
+        return retrofit
+            .create(WatchAPI::class.java)
+    }
+
+    @Singleton
+    @Provides
     fun providesDashboardRepository(
         context: Context,
         dashboardAPI: DashboardAPI
@@ -90,6 +101,12 @@ object AppModule {
     @Provides
     fun providesInfoRepository(context: Context, infoAPI: InfoAPI): InfoRepository {
         return InfoRepositoryImpl(context = context, infoAPI = infoAPI)
+    }
+
+    @Singleton
+    @Provides
+    fun providesWatchVideoRepository(context: Context,watchAPI: WatchAPI) : VideoRepository{
+        return VideoRepositoryImpl(context = context, api = watchAPI)
     }
 
     @Singleton
@@ -124,19 +141,27 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun provideVideoLink(repository: VideoRepository): VideoLinksUseCases {
+        return VideoLinksUseCases(repository)
+    }
+
+    @Singleton
+    @Provides
     fun providesDashboardUseCases(
         releaseUseCase: RecentReleaseUseCase,
         topAiringUseCase: TopAiringUseCase,
         infoDetails: InfoDetails,
         moviesAddedUseCase: MoviesAddedUseCase,
-        popularAnimeUseCase: PopularAnimeUseCase
+        popularAnimeUseCase: PopularAnimeUseCase,
+        videoLinksUseCases: VideoLinksUseCases
     ): DashboardUseCases {
         return DashboardUseCases(
             releaseUseCase,
             topAiringUseCase,
             infoDetails,
             moviesAddedUseCase,
-            popularAnimeUseCase
+            popularAnimeUseCase,
+            videoLinksUseCases
         )
     }
 

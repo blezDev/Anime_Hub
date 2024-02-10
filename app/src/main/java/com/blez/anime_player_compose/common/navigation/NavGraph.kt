@@ -25,7 +25,7 @@ fun SetupNavGraph(
 ) {
     NavHost(navController = navController, startDestination = startDestination) {
 
-        composable(route = Screen.LoginScreen.route){
+        composable(route = Screen.LoginScreen.route) {
             LoginScreen(navController)
         }
 
@@ -36,8 +36,24 @@ fun SetupNavGraph(
 
 
 
-        composable(route = Screen.VideoScreen.route){
-            VideoScreen(navController, window = window,actionBar)
+        composable(route = Screen.VideoScreen.route, arguments = listOf(navArgument("episode_id") {
+            type = NavType.StringType
+            defaultValue = "megumi-no-daigo-kyuukoku-no-orange"
+        }, navArgument("title") {
+            type = NavType.StringType
+            defaultValue = "Undead Unluck"
+        }, navArgument("episodeNumber"){
+            type = NavType.StringType
+            defaultValue = "Episode : 01"
+        })) {
+            VideoScreen(
+                navController = navController,
+                window = window,
+                actionBar = actionBar,
+                episodeId = it.arguments?.getString("episode_id").toString(),
+                title = it.arguments?.getString("title").toString(),
+                episodeNumber = it.arguments?.getString("episodeNumber").toString()
+            )
         }
 
 
