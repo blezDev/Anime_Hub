@@ -22,4 +22,7 @@ sealed class Screen(val route: String) {
             return "video_screen/${episodeId}&&${title}&&${episodeNumber}&&${animeId}"
         }
     }
+
+
+    data object SearchScreen : Screen("search_screen")
 }

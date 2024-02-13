@@ -85,7 +85,7 @@ fun HomeScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val credManager = CredManager(context)
-    Log.e("TOKEN", credManager.getToken().toString())
+
 
     DisposableEffect(Unit) {
         dashboardViewModel.fetchRecentRelease()
@@ -249,7 +249,7 @@ fun HomeScreen(
                                     .size(55.dp)
                                     .shadow(10.dp)
                                     .clickable {
-
+                                        navController.navigate(Screen.SearchScreen.route)
                                     }
 
                             )

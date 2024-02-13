@@ -9,10 +9,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
 import com.blez.anime_player_compose.common.navigation.SetupNavGraph
 import com.blez.anime_player_compose.common.util.CredManager
 import com.blez.anime_player_compose.common.util.Screen
+import com.blez.anime_player_compose.feature_search.presentation.SearchScreen
 import com.blez.anime_player_compose.ui.theme.Anime_player_composeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -27,6 +29,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Black
                 ) {
+
                     val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
                     val credManager = CredManager(this)
                     val window = window
@@ -43,6 +46,8 @@ class MainActivity : ComponentActivity() {
                         drawerState = drawerState,
                         actionBar
                     )
+
+
 
                 }
             }

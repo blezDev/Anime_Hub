@@ -13,6 +13,7 @@ import com.blez.anime_player_compose.common.util.Screen
 import com.blez.anime_player_compose.feature_dashboard.presentation.HomeScreen
 import com.blez.anime_player_compose.feature_detail_info.presentation.DetailScreen
 import com.blez.anime_player_compose.feature_login.presentation.LoginScreen
+import com.blez.anime_player_compose.feature_search.presentation.SearchScreen
 import com.blez.anime_player_compose.feature_video.presentation.VideoScreen
 
 @Composable
@@ -33,7 +34,9 @@ fun SetupNavGraph(
             HomeScreen(navController = navController, window = window, drawerState = drawerState)
         }
 
-
+        composable(route = Screen.SearchScreen.route){
+            SearchScreen(navController = navController)
+        }
 
 
         composable(route = Screen.VideoScreen.route, arguments = listOf(navArgument("episode_id") {

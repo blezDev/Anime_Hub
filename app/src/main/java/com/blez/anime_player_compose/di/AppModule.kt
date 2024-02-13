@@ -15,6 +15,10 @@ import com.blez.anime_player_compose.feature_detail_info.data.repository.InfoRep
 import com.blez.anime_player_compose.feature_detail_info.domain.repository.InfoRepository
 import com.blez.anime_player_compose.feature_detail_info.domain.use_cases.DetailsUseCases
 import com.blez.anime_player_compose.feature_detail_info.domain.use_cases.InfoDetails
+import com.blez.anime_player_compose.feature_search.data.remote.SearchAPI
+import com.blez.anime_player_compose.feature_search.data.repositorry.SearchRepositoryImpl
+import com.blez.anime_player_compose.feature_search.domain.repository.SearchRepository
+import com.blez.anime_player_compose.feature_search.domain.use_cases.SearchUseCase
 import com.blez.anime_player_compose.feature_video.data.remote.WatchAPI
 import com.blez.anime_player_compose.feature_video.data.repository.VideoRepositoryImpl
 import com.blez.anime_player_compose.feature_video.domain.repository.VideoRepository
@@ -83,9 +87,15 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providesWatchAPI(retrofit: Retrofit): WatchAPI{
+    fun providesWatchAPI(retrofit: Retrofit): WatchAPI {
         return retrofit
             .create(WatchAPI::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun providesSearchAPI(retrofit: Retrofit): SearchAPI {
+        return retrofit.create(SearchAPI::class.java)
     }
 
     @Singleton
@@ -105,8 +115,15 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providesWatchVideoRepository(context: Context,watchAPI: WatchAPI) : VideoRepository{
+    fun providesWatchVideoRepository(context: Context, watchAPI: WatchAPI): VideoRepository {
         return VideoRepositoryImpl(context = context, api = watchAPI)
+    }
+
+
+    @Singleton
+    @Provides
+    fun providesSearchRepository(context: Context, searchAPI: SearchAPI): SearchRepository {
+        return SearchRepositoryImpl(context = context, api = searchAPI)
     }
 
     @Singleton
@@ -169,6 +186,13 @@ object AppModule {
     @Provides
     fun providesDetailsUseCases(infoDetails: InfoDetails): DetailsUseCases {
         return DetailsUseCases(infoDetails)
+
+    }
+
+    @Singleton
+    @Provides
+    fun providesSearchUseCases(repository: SearchRepository): SearchUseCase {
+        return SearchUseCase(repository)
 
     }
 
