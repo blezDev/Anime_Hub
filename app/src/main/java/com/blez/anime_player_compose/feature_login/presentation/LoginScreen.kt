@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -61,11 +62,14 @@ fun LoginScreen(navController: NavHostController) {
                 .create(GoogleOuthAPI::class.java)
             scope.launch {
                 val result = google.getGoogleProfile(tokenId)
-                    .body()
-                credManager.saveProfilePic(result?.picture.toString())
-                credManager.saveGivenName(result?.given_name.toString())
-                credManager.saveFamilyName(result?.family_name.toString())
-                credManager.saveName(result?.name.toString())
+                if (result.code() == 200){
+
+                    credManager.saveProfilePic(result.body()?.picture.toString())
+                    credManager.saveGivenName(result.body()?.given_name.toString())
+                    credManager.saveFamilyName(result.body()?.family_name.toString())
+                    credManager.saveName(result.body()?.name.toString())
+                }
+
             }
             Log.e("TAG", tokenId)
 
@@ -79,7 +83,8 @@ fun LoginScreen(navController: NavHostController) {
     Image(
         modifier = Modifier.fillMaxSize(),
         painter = painterResource(id = R.drawable.login_bg),
-        contentDescription = "Background Image"
+        contentDescription = "Background Image",
+        contentScale = ContentScale.FillBounds
     )
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(

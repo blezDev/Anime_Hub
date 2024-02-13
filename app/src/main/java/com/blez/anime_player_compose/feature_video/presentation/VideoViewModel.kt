@@ -27,6 +27,7 @@ class VideoViewModel @Inject constructor(val dashboardUseCases: DashboardUseCase
 
     fun fetchVideo(episodeId: String) {
         viewModelScope.launch {
+            _fetchVideoState.emit(VideoUIEvent.Loading)
             when (val result = dashboardUseCases.videoLinksUseCases(episodeId)) {
                 is ResultState.Error -> {
                     _fetchVideoState.emit(VideoUIEvent.Failure(result.message.toString()))

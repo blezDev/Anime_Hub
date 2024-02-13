@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
                     SetupNavGraph(
                         navHostController,
                         startDestination = if (credManager.getToken() == null) {
-                            Screen.LoginScreen.route
+                            Screen.HomeScreen.route
                         } else {
                             Screen.HomeScreen.route
                         },

@@ -45,6 +45,9 @@ fun SetupNavGraph(
         }, navArgument("episodeNumber"){
             type = NavType.StringType
             defaultValue = "Episode : 01"
+        }, navArgument("animeId"){
+            type = NavType.StringType
+            defaultValue = "yubisaki-to-renren"
         })) {
             VideoScreen(
                 navController = navController,
@@ -52,7 +55,9 @@ fun SetupNavGraph(
                 actionBar = actionBar,
                 episodeId = it.arguments?.getString("episode_id").toString(),
                 title = it.arguments?.getString("title").toString(),
-                episodeNumber = it.arguments?.getString("episodeNumber").toString()
+                epiNumber = it.arguments?.getString("episodeNumber").toString(),
+                animeId = it.arguments?.getString("animeId").toString()
+
             )
         }
 

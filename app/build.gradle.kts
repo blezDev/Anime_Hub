@@ -169,5 +169,9 @@ dependencies {
         implementation("androidx.media3:media3-datasource:$media3_version")
         // Common functionality used across multiple media libraries
         implementation("androidx.media3:media3-common:$media3_version")
+
+        implementation("androidx.credentials:credentials:1.3.0-alpha01")
+        implementation("androidx.credentials:credentials-play-services-auth:1.3.0-alpha01")
+        implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
     }
 }

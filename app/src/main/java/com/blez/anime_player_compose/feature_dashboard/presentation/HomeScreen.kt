@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -54,6 +55,8 @@ import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.blez.anime_player_compose.R
 import com.blez.anime_player_compose.common.util.CredManager
@@ -98,6 +101,7 @@ fun HomeScreen(
     val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.meowjo))
 
 
+
     LazyColumn(modifier = Modifier.fillMaxSize(), content = {
         item {
             when (trendingState) {
@@ -111,6 +115,8 @@ fun HomeScreen(
                             LottieAnimation(
                                 modifier = Modifier.size(250.dp),
                                 composition = composition,
+                                iterations = LottieConstants.IterateForever
+
                             )
                             Spacer(modifier = Modifier.height(5.dp))
                             Text(text = "Loading..")
@@ -133,7 +139,7 @@ fun HomeScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .fillMaxHeight(0.3f)
-
+                                    .align(Alignment.Center)
 
                             ) {
                                 SubcomposeAsyncImage(
@@ -141,8 +147,9 @@ fun HomeScreen(
                                     contentDescription = "Latest Image",
                                     contentScale = ContentScale.Fit,
                                     modifier = Modifier
-                                        .fillMaxWidth()
+                                        .wrapContentWidth()
                                         .height(500.dp)
+                                        .align(Alignment.Center)
                                         .clickable {
                                             navController.navigate(
                                                 Screen.DetailScreen.passAnimeId(
@@ -241,6 +248,9 @@ fun HomeScreen(
                                 modifier = Modifier
                                     .size(55.dp)
                                     .shadow(10.dp)
+                                    .clickable {
+
+                                    }
 
                             )
                         }
@@ -412,7 +422,7 @@ fun HomeScreen(
                                     modifier = Modifier.padding(5.dp),
                                     imageUrl = it.image,
                                     title = it.title,
-                                    episodeNumber ="",
+                                    episodeNumber = "",
                                     episodeId = it.episodeId,
                                     animeId = it.id,
                                     textColor = Color.White,

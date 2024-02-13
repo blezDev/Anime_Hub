@@ -1,5 +1,7 @@
 package com.blez.anime_player_compose.common.util
 
+import com.blez.anime_player_compose.feature_detail_info.domain.model.Gogoanime_Episode
+
 sealed class Screen(val route: String) {
     data object HomeScreen : Screen("home_screen")
 
@@ -10,9 +12,14 @@ sealed class Screen(val route: String) {
         }
 
     }
-    data object VideoScreen : Screen("video_screen/{episode_id}&&{title}&&{episodeNumber}"){
-        fun passInfo(episodeId : String, title : String,episodeNumber : String ): String {
-            return "video_screen/${episodeId}&&${title}&&${episodeNumber}"
+    data object VideoScreen : Screen("video_screen/{episode_id}&&{title}&&{episodeNumber}&&{animeId}"){
+        fun passInfo(
+            episodeId: String,
+            title: String,
+            episodeNumber: String,
+            animeId: String
+        ): String {
+            return "video_screen/${episodeId}&&${title}&&${episodeNumber}&&${animeId}"
         }
     }
 }

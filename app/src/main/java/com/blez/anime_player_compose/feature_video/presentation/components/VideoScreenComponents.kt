@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.blez.anime_player_compose.feature_video.presentation.components
 
 import androidx.compose.animation.AnimatedVisibility
@@ -31,11 +33,16 @@ import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material.icons.filled.SubtitlesOff
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.LockOpen
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,10 +54,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.util.Log
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavHostController
 import com.blez.anime_player_compose.R
 import com.blez.anime_player_compose.common.util.Constants.PLAYER_SEEK_BACK_INCREMENT
 import com.blez.anime_player_compose.common.util.Constants.PLAYER_SEEK_FORWARD_INCREMENT
+import com.blez.anime_player_compose.feature_detail_info.domain.model.Gogoanime_Episode
+import com.blez.anime_player_compose.feature_video.domain.model.Source
 import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
 
@@ -61,7 +72,7 @@ fun PlayerController(
     modifier: Modifier = Modifier,
     isVisible: () -> Boolean,
     title: String,
-    episodeNumber : String,
+    episodeNumber: String,
     navHostController: NavHostController,
     onBackPressed: () -> Unit,
     isSubtitleEnabled: (Boolean) -> Unit,
@@ -74,7 +85,12 @@ fun PlayerController(
     onForwardClicked: (Long) -> Unit,
     onBackwardClicked: (Long) -> Unit,
     onMuteClicked: (Boolean) -> Unit,
-    muteState : ()-> Boolean = {false}
+    muteState: () -> Boolean = { false },
+    pauseState: () -> Boolean = { false },
+    qualityLists: List<Source>,
+    nextVideoClicked: () -> Unit = {},
+    episodeIds: List<Gogoanime_Episode>
+
 
 ) {
     val visible = remember(isVisible()) { isVisible() }
@@ -95,7 +111,7 @@ fun PlayerController(
                     .fillMaxWidth()
                     .padding(16.dp),
                 title = title,
-                episodeNumber  = episodeNumber,
+                episodeNumber = episodeNumber,
                 navController = navHostController,
                 onBackPressed = onBackPressed,
                 isSubtitleEnabled = isSubtitleEnabled
@@ -110,7 +126,8 @@ fun PlayerController(
                     onPausedClicked(it)
                 },
                 onForwardClicked = onForwardClicked,
-                onBackwardClicked = onBackwardClicked
+                onBackwardClicked = onBackwardClicked,
+                pauseState = pauseState
             )
 
 
@@ -150,7 +167,13 @@ fun PlayerController(
                     modifier = Modifier
                         .fillMaxWidth(),
                     onMuteClicked = onMuteClicked,
-                    muteState = muteState
+                    muteState = muteState,
+                    qualityList = qualityLists,
+                    episodeIds = episodeIds,
+                    episodeNumber = episodeNumber,
+                    nextVideoClicked = {
+                        nextVideoClicked()
+                    }
 
                 )
             }
@@ -354,10 +377,17 @@ fun CenterControl(
     onBackwardClicked: (Long) -> Unit = {},
     onForwardClicked: (Long) -> Unit = {},
     onPausedClicked: (Boolean) -> Unit = {},
+    pauseState: () -> Boolean,
 ) {
     var onPausedEnabled by remember {
         mutableStateOf(false)
     }
+
+    LaunchedEffect(key1 = pauseState()) {
+        onPausedEnabled = pauseState()
+    }
+
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxSize(),
@@ -365,7 +395,7 @@ fun CenterControl(
     ) {
 
         ReverseButton(onClicked = {
-        onBackwardClicked(it)
+            onBackwardClicked(it)
         })
         Spacer(modifier = Modifier.width(15.dp))
         if (onPausedEnabled) {
@@ -406,6 +436,7 @@ fun CenterControl(
 }
 
 
+@androidx.annotation.OptIn(UnstableApi::class)
 @Composable
 fun BottomControl(
     modifier: Modifier = Modifier,
@@ -413,16 +444,36 @@ fun BottomControl(
     onMuteClicked: (Boolean) -> Unit = {},
     onQualityClicked: (String) -> Unit = {},
     onFullScreenClicked: () -> Unit = {},
-    muteState : ()-> Boolean = {false}
+    muteState: () -> Boolean = { false },
+    qualityList: List<Source>? = listOf(),
+    nextVideoClicked: () -> Unit,
+    episodeIds: List<Gogoanime_Episode>,
+    episodeNumber: String
 ) {
     var onLockedEnabled by remember {
         mutableStateOf(false)
     }
 
-    var onMutedEnabled by remember{ mutableStateOf(false)}
+    var onMutedEnabled by remember { mutableStateOf(false) }
 
 
-    LaunchedEffect(key1 =  muteState()){
+    var isExpanded by remember {
+        mutableStateOf(false)
+    }
+
+    var qualitySelected by remember {
+        mutableStateOf("AUTO")
+    }
+
+
+    val options = listOf("1080p", "480p", "360p", "Outing", "Other")
+
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOptionText by remember { mutableStateOf(options[0]) }
+
+
+
+    LaunchedEffect(key1 = muteState()) {
         onMutedEnabled = muteState()
     }
 
@@ -493,7 +544,119 @@ fun BottomControl(
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Spacer(modifier = Modifier.width(15.dp))
-            Text(text = "AUTO", color = Color.White)
+            val episodeList = episodeIds.filter { "Episode : ${it.number}" != episodeNumber.last().toString() }
+            val list = episodeIds.filter { it.number >   episodeNumber.last().toString().toInt() }
+            if (episodeIds.isNotEmpty() && episodeList.isNotEmpty() && list.isNotEmpty()){
+                Text(text = "Next", color = Color.White, modifier = Modifier.clickable {
+                    nextVideoClicked()
+                })
+            }
+
+
+            Spacer(modifier = Modifier.width(15.dp))
+
+            Text(text = "1080p", color = Color.White)
+
+
+            /* ExposedDropdownMenuBox(
+                 expanded = expanded,
+                 onExpandedChange = {
+                     expanded = !expanded
+                 }
+             ) {
+                 TextField(
+                     readOnly = true,
+                     value = selectedOptionText,
+                     onValueChange = { },
+                     label = { Text("1080p") },
+                     trailingIcon = {
+                         ExposedDropdownMenuDefaults.TrailingIcon(
+                             expanded = expanded
+                         )
+                     },
+                     colors = ExposedDropdownMenuDefaults.textFieldColors()
+                 )
+
+                 ExposedDropdownMenu(
+                     expanded = expanded,
+                     onDismissRequest = {
+                         expanded = false
+                     }
+                 ) {
+                     options.forEach { selectionOption ->
+                         DropdownMenuItem(
+                             text = { Text(text = selectionOption) },
+                             onClick = {
+                                 selectedOptionText = selectionOption
+                                 expanded = false
+                             },
+                         )
+                     }
+                 }
+
+             }*/
+
+
+            /*    DropdownMenu(
+                    expanded = isExpanded,
+                    onDismissRequest = { isExpanded = false }
+                ) {
+
+                    if (qualityList != null) {
+                        for (i in qualityList) {
+                            DropdownMenuItem(text = { Text(text = i.quality, color = Color.Black)}, onClick = {
+                                qualitySelected = i.quality
+                                isExpanded = false
+                            })
+                        }
+                    }
+
+
+                }*/
+
+
+            /*       ExposedDropdownMenuBox(expanded = isExpanded, onExpandedChange = { isExpanded = it }) {
+                       TextField(
+                           value = qualitySelected,
+                           onValueChange = {},
+                           readOnly = true,
+                           colors= TextFieldDefaults.colors(unfocusedTextColor = Color.Black),
+                           modifier = Modifier.menuAnchor()
+                       )
+                       ExposedDropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false}) {
+                           if (qualityList != null) {
+                               for (i in qualityList){
+                                   DropdownMenuItem(text = { i.quality }, onClick = {
+                                       qualitySelected = i.quality
+                                       isExpanded = false
+                                   })
+                               }
+                           }
+
+                       }
+                   }*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             Spacer(modifier = Modifier.width(30.dp))
 
         }
@@ -540,5 +703,9 @@ fun ForwardButton(
         Text(text = (PLAYER_SEEK_FORWARD_INCREMENT / 1000).toString(), color = Color.White)
     }
 }
+
+
+
+
 
 

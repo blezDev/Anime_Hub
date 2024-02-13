@@ -1,5 +1,6 @@
 package com.blez.anime_player_compose.feature_detail_info.presentation
 
+import android.util.Log
 import android.view.Window
 import android.view.WindowManager
 import androidx.activity.compose.BackHandler
@@ -59,11 +60,11 @@ import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.blez.anime_player_compose.R
 import com.blez.anime_player_compose.common.util.Screen
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.EpisodeCard
-import com.blez.anime_player_compose.feature_detail_info.domain.model.Episode
 import com.blez.anime_player_compose.feature_detail_info.domain.model.Gogoanime_Episode
 import com.blez.anime_player_compose.feature_detail_info.presentation.components.ExpandableText
 import kotlinx.coroutines.android.awaitFrame
@@ -91,6 +92,9 @@ fun DetailScreen(
     var backPressHandled by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.pochi))
+
+
+
     BackHandler(enabled = !backPressHandled) {
         backPressHandled = true
         coroutineScope.launch {
@@ -107,6 +111,7 @@ fun DetailScreen(
                     LottieAnimation(
                         modifier = Modifier.size(250.dp),
                         composition = composition,
+                        iterations = LottieConstants.IterateForever
                     )
                     Spacer(modifier = Modifier.height(5.dp))
                     Text(text = "Loading..")
@@ -408,7 +413,7 @@ fun DetailScreen(
 
 
                     }
-                    EpisodeCards(episodes,navController,image,title)
+                    EpisodeCards(episodes,navController,image,title,animeId)
               /*      item {
                         Row(
                             modifier = Modifier
@@ -459,12 +464,19 @@ fun DetailScreen(
 
 }
 
-fun LazyListScope.EpisodeCards(episodes: List<Gogoanime_Episode>, navController: NavHostController, image:String,title : String){
+fun LazyListScope.EpisodeCards(
+    episodes: List<Gogoanime_Episode>,
+    navController: NavHostController,
+    image: String,
+    title: String,
+    animeId: String
+){
+
     items(episodes.toList()) {
         EpisodeCard(
             modifier = Modifier.padding(5.dp)
                 .clickable {
-                           navController.navigate(Screen.VideoScreen.passInfo(it.id, title,"Episode : ${it.number}"))
+                           navController.navigate(Screen.VideoScreen.passInfo(it.id, title,"${it.number}", animeId = animeId))
                 },
             id = it.id,
             episodeNumber = it.number.toString(),
