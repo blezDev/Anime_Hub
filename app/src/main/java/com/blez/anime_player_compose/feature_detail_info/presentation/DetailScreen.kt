@@ -476,7 +476,7 @@ fun LazyListScope.EpisodeCards(
         EpisodeCard(
             modifier = Modifier.padding(5.dp)
                 .clickable {
-                           navController.navigate(Screen.VideoScreen.passInfo(it.id, title,"${it.number}", animeId = animeId))
+                           navController.navigate(Screen.VideoScreen.passInfo(it.id, title,it.number, animeId = animeId))
                 },
             id = it.id,
             episodeNumber = it.number.toString(),

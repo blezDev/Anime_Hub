@@ -16,7 +16,7 @@ sealed class Screen(val route: String) {
         fun passInfo(
             episodeId: String,
             title: String,
-            episodeNumber: String,
+            episodeNumber: Int,
             animeId: String
         ): String {
             return "video_screen/${episodeId}&&${title}&&${episodeNumber}&&${animeId}"

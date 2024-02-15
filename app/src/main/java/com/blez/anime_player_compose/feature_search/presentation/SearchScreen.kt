@@ -1,6 +1,5 @@
 package com.blez.anime_player_compose.feature_search.presentation
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,16 +13,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,7 +65,6 @@ fun SearchScreen(
                 .fillMaxWidth()
                 .padding(vertical = 10.dp)
         ) {
-
             searchViewModel.fetchAnime(query = it)
             searchViewModel.shiftUI()
         }
@@ -76,7 +73,24 @@ fun SearchScreen(
             SearchViewModel.UIShift.SearchQuery -> {
                 when (searchState) {
                     is SearchViewModel.SearchUIEvent.Failure -> {}
-                    SearchViewModel.SearchUIEvent.Idle -> {}
+                    SearchViewModel.SearchUIEvent.Idle -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column {
+                                LottieAnimation(
+                                    modifier = Modifier.size(250.dp),
+                                    composition = composition,
+                                    iterations = LottieConstants.IterateForever
+
+                                )
+                                Spacer(modifier = Modifier.height(5.dp))
+                                Text(text = "Loading..")
+                            }
+
+                        }
+                     }
                     SearchViewModel.SearchUIEvent.Loading -> {
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -97,11 +111,9 @@ fun SearchScreen(
                     }
 
                     is SearchViewModel.SearchUIEvent.Success -> {
-                        val data by rememberSaveable {
-                            mutableStateOf((searchState as SearchViewModel.SearchUIEvent.Success).data.results)
-                        }
+                        val data = (searchState as SearchViewModel.SearchUIEvent.Success).data
                         LazyColumn(content = {
-                            items(data) { anime ->
+                            items(data.results) { anime ->
                                 SearchCard(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -129,9 +141,7 @@ fun SearchScreen(
                     is DashboardViewModel.AiringUIEvent.Failure -> {}
                     DashboardViewModel.AiringUIEvent.Loading -> {}
                     is DashboardViewModel.AiringUIEvent.Success -> {
-                        val data by rememberSaveable {
-                            mutableStateOf((trendingState as DashboardViewModel.AiringUIEvent.Success).data.results.shuffled())
-                        }
+                        val data= (trendingState as DashboardViewModel.AiringUIEvent.Success).data.results
                         Text(
                             text = "Top Searches",
                             color = Color.White,

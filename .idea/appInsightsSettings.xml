@@ -27,10 +27,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.blez.anime_player_compose" />
+                  <option name="mobileSdkAppId" value="1:858386657572:android:b2bb16e683e8e488d743b1" />
+                  <option name="projectId" value="anime-hub-e59d4" />
+                  <option name="projectNumber" value="858386657572" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

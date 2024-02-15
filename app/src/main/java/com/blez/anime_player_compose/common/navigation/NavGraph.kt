@@ -46,8 +46,8 @@ fun SetupNavGraph(
             type = NavType.StringType
             defaultValue = "Undead Unluck"
         }, navArgument("episodeNumber"){
-            type = NavType.StringType
-            defaultValue = "Episode : 01"
+            type = NavType.IntType
+            defaultValue = 1
         }, navArgument("animeId"){
             type = NavType.StringType
             defaultValue = "yubisaki-to-renren"
@@ -58,7 +58,7 @@ fun SetupNavGraph(
                 actionBar = actionBar,
                 episodeId = it.arguments?.getString("episode_id").toString(),
                 title = it.arguments?.getString("title").toString(),
-                epiNumber = it.arguments?.getString("episodeNumber").toString(),
+                epiNumber = it.arguments?.getInt("episodeNumber") ?: 1,
                 animeId = it.arguments?.getString("animeId").toString()
 
             )

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "858386657572",
+    "project_id": "anime-hub-e59d4",
+    "storage_bucket": "anime-hub-e59d4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:858386657572:android:b2bb16e683e8e488d743b1",
+        "android_client_info": {
+          "package_name": "com.blez.anime_player_compose"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtukSSn_yQ3YVNQikN1li7dqKELe6rU4I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

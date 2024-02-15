@@ -77,7 +77,8 @@ fun LoginScreen(navController: NavHostController) {
         onDialogDismissed = {
             Log.e("DIS", it)
         },
-        rememberAccount = false
+        rememberAccount = false,
+
     )
 
     Image(

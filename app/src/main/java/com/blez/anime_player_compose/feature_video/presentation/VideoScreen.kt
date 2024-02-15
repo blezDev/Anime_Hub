@@ -1,6 +1,8 @@
 package com.blez.anime_player_compose.feature_video.presentation
 
 import android.app.ActionBar
+import android.app.Activity
+import android.content.pm.ActivityInfo
 import android.os.Build
 import android.view.ViewGroup
 import android.view.Window
@@ -8,7 +10,6 @@ import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.FrameLayout
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.annotation.OptIn
@@ -40,7 +41,6 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -76,7 +76,7 @@ fun VideoScreen(
     title: String,
     videoViewModel: VideoViewModel = hiltViewModel(),
     detailViewModel: DetailViewModel = hiltViewModel(),
-    epiNumber: String,
+    epiNumber: Int,
     animeId: String
 ) {
 
@@ -86,6 +86,15 @@ fun VideoScreen(
         detailViewModel.fetchDetails(animeId = animeId )
         onDispose {  }
     }
+
+    val activity = LocalContext.current as Activity
+    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
+
+
+
+
+
     val videoState by videoViewModel.fetchVideoState.collectAsState()
     val loadComposition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.video_load))
     val errorComposition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.error_load))
@@ -351,8 +360,15 @@ fun VideoScreen(
                             episodeIds =  episodeData.episodes,
                             nextVideoClicked = {
                                // val episodeData = episodeData.episodes.filter { it.number > episodeNumber[episodeNumber.length - 1].code }.sortedBy { it.number }.first()
-                                val episodeNext = episodeData.episodes.filter { it.number > epiNumber.toInt() }
-                                navController.navigate(Screen.VideoScreen.passInfo(episodeNext.first().id, title,"Episode : ${episodeNext.first().number}", animeId = animeId))
+                                try {
+                                    val episodeNext = episodeData.episodes.filter { it.number > epiNumber }
+
+                                    navController.navigate(Screen.VideoScreen.passInfo(episodeNext.first().id, title,episodeNext.first().number, animeId = animeId))
+
+
+                                }catch (e : Exception){
+                                    throw e
+                                }
                             }
                         )
                     }
