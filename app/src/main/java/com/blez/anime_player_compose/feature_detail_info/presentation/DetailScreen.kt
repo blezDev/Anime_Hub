@@ -1,5 +1,7 @@
 package com.blez.anime_player_compose.feature_detail_info.presentation
 
+import android.app.Activity
+import android.content.pm.ActivityInfo
 import android.util.Log
 import android.view.Window
 import android.view.WindowManager
@@ -49,6 +51,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -83,6 +86,9 @@ fun DetailScreen(
         WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
         WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
     )
+    val activity = LocalContext.current as Activity
+    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+
     DisposableEffect(Unit) {
         detailViewModel.fetchDetails(animeId)
         onDispose {}
@@ -189,7 +195,9 @@ fun DetailScreen(
                                 Icon(
                                     imageVector = Icons.Filled.PlayArrow,
                                     contentDescription = "Start Button",
-                                    modifier = Modifier.size(85.dp).shadow(25.dp),
+                                    modifier = Modifier
+                                        .size(85.dp)
+                                        .shadow(25.dp),
                                     tint = Color.LightGray
                                 )
                             }
@@ -246,7 +254,7 @@ fun DetailScreen(
                                 .fillMaxWidth()
                                 .padding(horizontal = 15.dp)
                         ) {
-                            Row {
+                            Row(modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween) {
 
                                 Text(
                                     text = title,
@@ -256,18 +264,20 @@ fun DetailScreen(
                                     textAlign = TextAlign.Start,
                                     overflow = TextOverflow.Clip,
                                 )
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Icon(
-                                    imageVector = Icons.Filled.Bookmark,
-                                    contentDescription = "Saved Button",
-                                    tint = Color.White
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Icon(
-                                    imageVector = Icons.Filled.Share,
-                                    contentDescription = "Share Button",
-                                    tint = Color.White
-                                )
+
+                                Row(Modifier.padding(end = 5.dp)) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Bookmark,
+                                        contentDescription = "Saved Button",
+                                        tint = Color.White
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Icon(
+                                        imageVector = Icons.Filled.Share,
+                                        contentDescription = "Share Button",
+                                        tint = Color.White
+                                    )
+                                }
                             }
 
                             /*     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
@@ -474,9 +484,17 @@ fun LazyListScope.EpisodeCards(
 
     items(episodes.toList()) {
         EpisodeCard(
-            modifier = Modifier.padding(5.dp)
+            modifier = Modifier
+                .padding(5.dp)
                 .clickable {
-                           navController.navigate(Screen.VideoScreen.passInfo(it.id, title,it.number, animeId = animeId))
+                    navController.navigate(
+                        Screen.VideoScreen.passInfo(
+                            it.id,
+                            title,
+                            it.number,
+                            animeId = animeId
+                        )
+                    )
                 },
             id = it.id,
             episodeNumber = it.number.toString(),

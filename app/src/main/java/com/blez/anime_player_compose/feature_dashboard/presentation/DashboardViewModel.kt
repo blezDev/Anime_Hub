@@ -1,16 +1,21 @@
 package com.blez.anime_player_compose.feature_dashboard.presentation
 
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blez.anime_player_compose.common.util.ResultState
+import com.blez.anime_player_compose.core.entries.ListEntity
 import com.blez.anime_player_compose.feature_dashboard.domain.model.MovieModel
 import com.blez.anime_player_compose.feature_dashboard.domain.model.PopularAnimeModel
 import com.blez.anime_player_compose.feature_dashboard.domain.model.Top_Airing
 import com.blez.anime_player_compose.feature_dashboard.domain.model.ZoroModel
 import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.DashboardUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -45,6 +50,18 @@ class DashboardViewModel @Inject constructor(val dashboardUseCases: DashboardUse
 
     }
 
+    sealed class SavedHistoryUIEvent {
+        data object Loading : SavedHistoryUIEvent()
+
+        data class Success(val data: List<ListEntity>) : SavedHistoryUIEvent()
+        data class Failure(val message: String) : SavedHistoryUIEvent()
+    }
+
+    private var getHistoryJob: Job? = null
+
+    init {
+        getSavedWatchHistory()
+    }
     private val _fetchState = MutableStateFlow<UIEvent>(UIEvent.Loading)
     val fetchState: StateFlow<UIEvent>
         get() = _fetchState
@@ -63,6 +80,22 @@ class DashboardViewModel @Inject constructor(val dashboardUseCases: DashboardUse
     val fetchCompletedAnime: StateFlow<MovieAnimeUIEvent>
         get() = _fetchCompletedAnime
 
+    private val _fetchSavedHistory = MutableStateFlow<SavedHistoryUIEvent>(SavedHistoryUIEvent.Loading)
+    val fetchHistory : StateFlow<SavedHistoryUIEvent>
+        get() = _fetchSavedHistory
+    
+    
+    fun getSavedWatchHistory(){
+        getHistoryJob?.cancel()
+        getHistoryJob = dashboardUseCases.getAnimeListUseCases()
+            .onEach {
+                _fetchSavedHistory.value = SavedHistoryUIEvent.Success(it)
+            }
+            .launchIn(viewModelScope)
+    }
+    
+    
+    
     fun fetchTopAiring(page: Int = 1) {
         viewModelScope.launch {
             when (val result = dashboardUseCases.topAiringUseCase(page)) {
@@ -151,4 +184,11 @@ class DashboardViewModel @Inject constructor(val dashboardUseCases: DashboardUse
             }
         }
     }
+
+    fun addAnimeList(data: ListEntity) {
+        viewModelScope.launch {
+            dashboardUseCases.insertAnimeUseCase(data)
+        }
+    }
+
 }

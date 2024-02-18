@@ -1,6 +1,5 @@
 package com.blez.anime_player_compose.feature_dashboard.presentation
 
-import android.util.Log
 import android.view.Window
 import android.view.WindowManager
 import androidx.compose.foundation.Image
@@ -35,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,7 +56,6 @@ import coil.compose.SubcomposeAsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.blez.anime_player_compose.R
 import com.blez.anime_player_compose.common.util.CredManager
@@ -97,12 +96,23 @@ fun HomeScreen(
     val state by dashboardViewModel.fetchState.collectAsState()
     val trendingState by dashboardViewModel.topAiringState.collectAsState()
     val recentData by dashboardViewModel.fetchRecentAdded.collectAsState()
+    val historyData  by dashboardViewModel.fetchHistory.collectAsState()
     val completedAnimeData by dashboardViewModel.fetchCompletedAnime.collectAsState()
     val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.meowjo))
 
 
+    var listSavedState by remember {
+        mutableStateOf(true)
+    }
+
 
     LazyColumn(modifier = Modifier.fillMaxSize(), content = {
+
+
+
+
+
+
         item {
             when (trendingState) {
                 is DashboardViewModel.AiringUIEvent.Failure -> {
@@ -212,9 +222,9 @@ fun HomeScreen(
                                             .padding(horizontal = 10.dp),
                                         horizontalArrangement = Arrangement.SpaceAround
                                     ) {
-                                        ListButton() {
-                                            //TODO LIST ADD FUNCTIONALITY
-                                        }
+                                        ListButton(listState = listSavedState, onClicked = {
+                                            listSavedState = !listSavedState
+                                        })
                                         PlayButton(
                                             textModifier = Modifier.padding(horizontal = 9.dp),
                                             modifier = Modifier
@@ -226,7 +236,13 @@ fun HomeScreen(
                                             //TODO Play FUNCTIONALITY
                                         }
                                         InfoButton {
-                                            //TODO Info FUNCTIONALITY
+                                            navController.navigate(
+                                                Screen.DetailScreen.passAnimeId(
+                                                    trend.id,
+                                                    trend.title
+                                                )
+                                            )
+
                                         }
                                     }
                                 }
@@ -290,6 +306,65 @@ fun HomeScreen(
                 }
             }
         }
+
+
+        item {
+            Spacer(modifier = Modifier.height(10.dp))
+            when(historyData){
+                is DashboardViewModel.SavedHistoryUIEvent.Failure -> {}
+                DashboardViewModel.SavedHistoryUIEvent.Loading -> {}
+                is DashboardViewModel.SavedHistoryUIEvent.Success ->{
+                    val data = (historyData as DashboardViewModel.SavedHistoryUIEvent.Success).data
+
+                    if (data.isNotEmpty())
+                    {
+                   
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                text = stringResource(R.string.history_list),
+                                color = Color.White,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Cursive,
+                                modifier = Modifier.padding(start = 10.dp)
+                            )
+                            LazyRow(content = {
+                                items(data) { it ->
+                                    AnimeCard(
+                                        modifier = Modifier.padding(5.dp),
+                                        imageUrl = it.image,
+                                        title = it.title,
+                                        episodeNumber = it.episodeNo.toString(),
+                                        episodeId = it.episodeId,
+                                        animeId = it.animeId,
+                                        textColor = Color.White,
+                                        onClicked = {
+                                            navController.navigate(
+                                                route = Screen.DetailScreen.passAnimeId(
+                                                    it.animeId,
+                                                    it.title
+                                                )
+                                            )
+                                        }
+                                    )
+                                }
+                            })
+                        }
+
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
 
         item {
             Spacer(modifier = Modifier.height(10.dp))
@@ -498,27 +573,6 @@ fun HomeScreen(
 }
 
 
-/*fun LazyListScope.AnimeCards(results: List<GogoAnime_Result>, navController: NavHostController) {
-    items(results.size) {
-        AnimeCard(
-            modifier = Modifier.padding(2.dp),
-            imageUrl = results[it].image,
-            title = results[it].title,
-            episodeNumber = results[it].episodeNumber.toString(),
-            episodeId = results[it].episodeId,
-            animeId = results[it].id,
-            textColor = Color.White,
-            onClicked = {
-                navController.navigate(
-                    route = Screen.DetailScreen.passAnimeId(
-                        results[it].id,
-                        results[it].title
-                    )
-                )
-            }
-        )
-    }
-}*/
 
 
 

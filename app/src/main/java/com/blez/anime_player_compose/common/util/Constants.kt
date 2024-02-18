@@ -19,5 +19,8 @@ object Constants {
      const val PLAYER_SEEK_BACK_INCREMENT = 5 * 1000L // 5 seconds
      const val PLAYER_SEEK_FORWARD_INCREMENT = 5 * 1000L // 5 seconds
 
+    //Database
+    const val LIST_ENTITY = "LIST_ENTITY"
+
 
 }

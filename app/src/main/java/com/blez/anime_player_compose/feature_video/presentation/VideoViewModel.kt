@@ -3,6 +3,7 @@ package com.blez.anime_player_compose.feature_video.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blez.anime_player_compose.common.util.ResultState
+import com.blez.anime_player_compose.core.entries.ListEntity
 import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.DashboardUseCases
 import com.blez.anime_player_compose.feature_video.domain.model.VideoModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,4 +47,27 @@ class VideoViewModel @Inject constructor(val dashboardUseCases: DashboardUseCase
             }
         }
     }
+
+
+    fun saveHistory(
+        animeId: String,
+        image: String,
+        title: String,
+        episodeId: String,
+        episodeNumber: String
+    ) {
+        viewModelScope.launch {
+            dashboardUseCases.insertAnimeUseCase(
+                data = ListEntity(
+                    animeId = animeId,
+                    image = image,
+                    title = title,
+                    episodeId = episodeId,
+                    episodeNo = episodeNumber
+                )
+            )
+        }
+    }
+
+
 }

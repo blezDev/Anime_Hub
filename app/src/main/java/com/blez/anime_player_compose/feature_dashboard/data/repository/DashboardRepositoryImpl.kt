@@ -5,6 +5,8 @@ import android.util.Log
 import com.blez.anime_player_compose.common.util.ResultState
 import com.blez.anime_player_compose.common.util.RunningCache
 import com.blez.anime_player_compose.common.util.checkForInternetConnection
+import com.blez.anime_player_compose.core.entries.ListEntity
+import com.blez.anime_player_compose.core.local.listDao.ListDao
 import com.blez.anime_player_compose.feature_dashboard.data.remote.DashboardAPI
 import com.blez.anime_player_compose.feature_dashboard.domain.model.MovieModel
 import com.blez.anime_player_compose.feature_dashboard.domain.model.PopularAnimeModel
@@ -12,10 +14,12 @@ import com.blez.anime_player_compose.feature_dashboard.domain.model.Recent_Relea
 import com.blez.anime_player_compose.feature_dashboard.domain.model.Top_Airing
 import com.blez.anime_player_compose.feature_dashboard.domain.model.ZoroModel
 import com.blez.anime_player_compose.feature_dashboard.domain.repository.DashboardRepository
+import kotlinx.coroutines.flow.Flow
 
 class DashboardRepositoryImpl(
     private val context: Context,
-    private val dashboardAPI: DashboardAPI
+    private val dashboardAPI: DashboardAPI,
+    private val dao: ListDao
 ) : DashboardRepository {
     override suspend fun getRecentRelease(page: Int): ResultState<ZoroModel> {
         if (!context.checkForInternetConnection()) {
@@ -77,5 +81,13 @@ class DashboardRepositoryImpl(
             return ResultState.Success(data = result.body())
         }
         return ResultState.Error("Something went wrong")
+    }
+
+    override fun getAnimeList(): Flow<List<ListEntity>> {
+      return dao.getLists()
+    }
+
+    override suspend fun insertAnimeList(data: ListEntity) {
+        dao.insertAnimeList(data)
     }
 }

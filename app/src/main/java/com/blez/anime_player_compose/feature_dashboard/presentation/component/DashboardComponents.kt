@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
@@ -25,6 +26,10 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
@@ -51,20 +56,40 @@ fun ListButton(
     modifier: Modifier = Modifier,
     textColor: Color = Color.White,
     plusIconColor: Color = Color.White,
-    onClicked: () -> Unit
+    onClicked: () -> Unit,
+    listState : Boolean
 ) {
-    Column(modifier = modifier.shadow(10.dp).clickable {
-        onClicked()
-    }) {
-        Image(
-            imageVector = Icons.Default.Add,
-            contentDescription = "Adding to List Button",
-            colorFilter = ColorFilter.tint(
-                plusIconColor
-            ),
-            alignment = Alignment.Center,
-            modifier = modifier.align(Alignment.CenterHorizontally)
-        )
+    var listed by remember(listState) {
+        mutableStateOf(listState)
+    }
+    Column(modifier = modifier
+        .shadow(10.dp)
+        .clickable {
+            onClicked()
+        }) {
+        if (listed){
+            Image(
+                imageVector = Icons.Default.Check,
+                contentDescription = "Adding to List Button",
+                colorFilter = ColorFilter.tint(
+                    plusIconColor
+                ),
+                alignment = Alignment.Center,
+                modifier = modifier.align(Alignment.CenterHorizontally)
+            )
+        }else
+        {
+            Image(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Adding to List Button",
+                colorFilter = ColorFilter.tint(
+                    plusIconColor
+                ),
+                alignment = Alignment.Center,
+                modifier = modifier.align(Alignment.CenterHorizontally)
+            )
+        }
+
         Text(
             text = stringResource(R.string.personal_list_text),
             fontWeight = FontWeight.Bold,
@@ -107,9 +132,11 @@ fun InfoButton(
     infoIconColor: Color = Color.White,
     onClicked: () -> Unit
 ) {
-    Column(modifier = modifier.shadow(10.dp).clickable {
-        onClicked()
-    }) {
+    Column(modifier = modifier
+        .shadow(10.dp)
+        .clickable {
+            onClicked()
+        }) {
         Image(
             imageVector = Icons.Outlined.Info,
             contentDescription = "Adding to List Button",
@@ -142,7 +169,10 @@ fun AnimeCard(
     onClicked: () -> Unit,
     textColor: Color = Color.Black,
 ) {
-    Column(modifier.fillMaxSize().clickable { onClicked() }) {
+    Column(
+        modifier
+            .fillMaxSize()
+            .clickable { onClicked() }) {
         Box(modifier = modifier.fillMaxWidth()) {
             SubcomposeAsyncImage(
                 modifier = modifier

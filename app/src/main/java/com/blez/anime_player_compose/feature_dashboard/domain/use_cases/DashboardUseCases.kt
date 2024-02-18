@@ -9,5 +9,7 @@ data class DashboardUseCases(
     val infoDetails: InfoDetails,
     val moviesAddedUseCase: MoviesAddedUseCase,
     val popularAnimeUseCase: PopularAnimeUseCase,
-    val videoLinksUseCases: VideoLinksUseCases
+    val videoLinksUseCases: VideoLinksUseCases,
+    val getAnimeListUseCases : GetAnimeListUseCase,
+    val insertAnimeUseCase: InsertAnimeUseCase
 )

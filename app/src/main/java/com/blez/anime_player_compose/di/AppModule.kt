@@ -1,11 +1,16 @@
 package com.blez.anime_player_compose.di
 
+import android.app.Application
 import android.content.Context
+import androidx.room.Room
 import com.blez.anime_player_compose.common.util.Constants
+import com.blez.anime_player_compose.core.db.AnimeDatabase
 import com.blez.anime_player_compose.feature_dashboard.data.remote.DashboardAPI
 import com.blez.anime_player_compose.feature_dashboard.data.repository.DashboardRepositoryImpl
 import com.blez.anime_player_compose.feature_dashboard.domain.repository.DashboardRepository
 import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.DashboardUseCases
+import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.GetAnimeListUseCase
+import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.InsertAnimeUseCase
 import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.MoviesAddedUseCase
 import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.PopularAnimeUseCase
 import com.blez.anime_player_compose.feature_dashboard.domain.use_cases.RecentReleaseUseCase
@@ -102,9 +107,10 @@ object AppModule {
     @Provides
     fun providesDashboardRepository(
         context: Context,
-        dashboardAPI: DashboardAPI
+        dashboardAPI: DashboardAPI,
+        db : AnimeDatabase
     ): DashboardRepository {
-        return DashboardRepositoryImpl(context = context, dashboardAPI = dashboardAPI)
+        return DashboardRepositoryImpl(context = context, dashboardAPI = dashboardAPI, dao = db.listDao)
     }
 
     @Singleton
@@ -164,13 +170,28 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun provideGetAnimeListUseCase(repository: DashboardRepository): GetAnimeListUseCase {
+        return GetAnimeListUseCase(repository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideInsertAnimeUseCase(repository: DashboardRepository): InsertAnimeUseCase {
+        return InsertAnimeUseCase(repository)
+    }
+
+
+    @Singleton
+    @Provides
     fun providesDashboardUseCases(
         releaseUseCase: RecentReleaseUseCase,
         topAiringUseCase: TopAiringUseCase,
         infoDetails: InfoDetails,
         moviesAddedUseCase: MoviesAddedUseCase,
         popularAnimeUseCase: PopularAnimeUseCase,
-        videoLinksUseCases: VideoLinksUseCases
+        videoLinksUseCases: VideoLinksUseCases,
+        insertAnimeUseCase: InsertAnimeUseCase,
+        getAnimeListUseCase: GetAnimeListUseCase
     ): DashboardUseCases {
         return DashboardUseCases(
             releaseUseCase,
@@ -178,7 +199,9 @@ object AppModule {
             infoDetails,
             moviesAddedUseCase,
             popularAnimeUseCase,
-            videoLinksUseCases
+            videoLinksUseCases,
+            getAnimeListUseCases = getAnimeListUseCase,
+            insertAnimeUseCase =insertAnimeUseCase
         )
     }
 
@@ -194,6 +217,15 @@ object AppModule {
     fun providesSearchUseCases(repository: SearchRepository): SearchUseCase {
         return SearchUseCase(repository)
 
+    }
+
+
+    @Singleton
+    @Provides
+    fun providesAnimeDatabase(app : Application) : AnimeDatabase{
+        return Room.databaseBuilder(app,AnimeDatabase::class.java,"anime_db")
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
 

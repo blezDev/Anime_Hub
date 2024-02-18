@@ -79,16 +79,18 @@ fun VideoScreen(
     epiNumber: Int,
     animeId: String
 ) {
-
+    val activity = LocalContext.current as Activity
     val episodeNumber = "Episode : ${epiNumber}"
     DisposableEffect(key1 =  Unit){
         videoViewModel.fetchVideo(episodeId)
         detailViewModel.fetchDetails(animeId = animeId )
+
+        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         onDispose {  }
     }
 
-    val activity = LocalContext.current as Activity
-    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
 
 
 
@@ -151,7 +153,7 @@ fun VideoScreen(
                 }
                 is VideoViewModel.VideoUIEvent.Success -> {
 
-
+                    val episodeData = (state as DetailViewModel.DetailsUIEvent.Success).data
                     var backPressHandled by remember { mutableStateOf(false) }
                     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
                     val coroutineScope = rememberCoroutineScope()
@@ -163,7 +165,31 @@ fun VideoScreen(
                             backPressHandled = false
                         }
                     }
+
+                    DisposableEffect(key1 = Unit){
+                        videoViewModel.saveHistory(
+                            animeId = animeId,
+                            image = episodeData.image,
+                            title = title,
+                            episodeId = episodeId,
+                            episodeNumber = epiNumber.toString()
+
+                        )
+                        onDispose {  }
+                    }
+
+
+
+
+
+
+
+
+
                     val context = LocalContext.current
+
+
+
 
                     //Hides the ugly action bar at the top
                     actionBar?.hide()
@@ -279,7 +305,7 @@ fun VideoScreen(
                         var currentVolume by remember {
                             mutableStateOf(0f)
                         }
-                        val episodeData = (state as DetailViewModel.DetailsUIEvent.Success).data
+
                         AndroidView(
                             modifier = Modifier.clickable {
                                 shouldShowControls = shouldShowControls.not()
