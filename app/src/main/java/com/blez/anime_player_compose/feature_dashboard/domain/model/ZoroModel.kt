@@ -34,7 +34,7 @@ data class Model(
 
 data class GogoAnime_Result(
     val episodeId: String,
-    val episodeNumber: Int,
+    val episodeNumber: Float?=1f,
     val id: String,
     val image: String,
     val title: String,

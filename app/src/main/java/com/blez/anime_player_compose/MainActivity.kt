@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationRailItemColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -48,44 +50,45 @@ class MainActivity : ComponentActivity() {
 
 
 
-                Scaffold(
+              /*  Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
-                    bottomNavigationItems.forEach {
-                        NavigationDrawerItem(
-                            label = { it.label },
-                            selected = it.active ,
-                            onClick = {
-                                it.active = !it.active
-                            })
-                    }
-                    }
-
-                    ) {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-
-                    ) {
-
-                        val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
-                        val credManager = CredManager(this)
-                        val window = window
-                        val actionBar = actionBar
-                        val navHostController = rememberNavController()
-                        SetupNavGraph(
-                            navHostController,
-                            startDestination = if (credManager.getToken() == null) {
-                                Screen.HomeScreen.route
-                            } else {
-                                Screen.HomeScreen.route
-                            },
-                            window,
-                            drawerState = drawerState,
-                            actionBar
-                        )
+                        bottomNavigationItems.forEach {
+                            NavigationDrawerItem(
+                                label = { it.label },
+                                selected = it.active,
+                                onClick = {
+                                    it.active = !it.active
+                                },
+                                )
+                        }
                     }
 
+                ) {
 
+                }*/
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = Color.Black
+
+                ) {
+
+                    val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
+                    val credManager = CredManager(this)
+                    val window = window
+                    val actionBar = actionBar
+                    val navHostController = rememberNavController()
+                    SetupNavGraph(
+                        navHostController,
+                        startDestination = if (credManager.getToken() == null) {
+                            Screen.HomeScreen.route
+                        } else {
+                            Screen.HomeScreen.route
+                        },
+                        window,
+                        drawerState = drawerState,
+                        actionBar
+                    )
                 }
             }
         }

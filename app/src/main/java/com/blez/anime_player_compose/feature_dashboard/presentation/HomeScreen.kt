@@ -64,6 +64,7 @@ import com.blez.anime_player_compose.feature_dashboard.presentation.component.An
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.InfoButton
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.ListButton
 import com.blez.anime_player_compose.feature_dashboard.presentation.component.PlayButton
+import kotlin.math.roundToInt
 
 
 @Composable
@@ -397,7 +398,10 @@ fun HomeScreen(
                                     modifier = Modifier.padding(5.dp),
                                     imageUrl = it.image,
                                     title = it.title,
-                                    episodeNumber = it.episodeNumber.toString(),
+                                    episodeNumber =
+                                        if (it.episodeNumber?.toString()?.substringAfter(".", "0")?.any { it != '0' }
+                                                ?: true) it.episodeNumber.toString() else it.episodeNumber?.roundToInt().toString()
+                                    ,
                                     episodeId = it.episodeId,
                                     animeId = it.id,
                                     textColor = Color.White,

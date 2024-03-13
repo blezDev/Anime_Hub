@@ -15,6 +15,7 @@ import com.blez.anime_player_compose.feature_dashboard.domain.model.Top_Airing
 import com.blez.anime_player_compose.feature_dashboard.domain.model.ZoroModel
 import com.blez.anime_player_compose.feature_dashboard.domain.repository.DashboardRepository
 import kotlinx.coroutines.flow.Flow
+import kotlin.math.roundToInt
 
 class DashboardRepositoryImpl(
     private val context: Context,
@@ -40,11 +41,11 @@ class DashboardRepositoryImpl(
         if (!context.checkForInternetConnection()) {
             return ResultState.Error("Couldn\'t reach server. Check your internet connection.")
         }
-        if (cache[page] != null){
+        if (cache[page] != null) {
             return ResultState.Success(data = cache[page])
         }
         val result = dashboardAPI.getTopAiring(page)
-        if (result.code()==200 && result.body() != null){
+        if (result.code() == 200 && result.body() != null) {
             return ResultState.Success(data = result.body())
         }
         return ResultState.Error("Something went wrong")
@@ -52,15 +53,15 @@ class DashboardRepositoryImpl(
 
     override suspend fun getPopularAnime(page: Int): ResultState<PopularAnimeModel> {
         val cache = RunningCache.popularCache
-        if (!context.checkForInternetConnection()){
+        if (!context.checkForInternetConnection()) {
             return ResultState.Error("Couldn\'t reach server. Check your internet connection.")
         }
-        if (cache[page] !=null){
+        if (cache[page] != null) {
             return ResultState.Success(data = cache[page])
         }
         val result = dashboardAPI.getPopular(page)
 
-        if (result.code()==200 && result.body() != null){
+        if (result.code() == 200 && result.body() != null) {
             return ResultState.Success(data = result.body())
         }
         return ResultState.Error("Something went wrong")
@@ -69,22 +70,22 @@ class DashboardRepositoryImpl(
 
     override suspend fun getMoviesAnime(page: Int): ResultState<MovieModel> {
         val cache = RunningCache.moviesAnimeCache
-        if (!context.checkForInternetConnection()){
+        if (!context.checkForInternetConnection()) {
             return ResultState.Error("Couldn\'t reach server. Check your internet connection.")
         }
-        if (cache[page] !=null){
+        if (cache[page] != null) {
             return ResultState.Success(data = cache[page])
         }
         val result = dashboardAPI.getMovies(page)
 
-        if (result.code()==200 && result.body() != null){
+        if (result.code() == 200 && result.body() != null) {
             return ResultState.Success(data = result.body())
         }
         return ResultState.Error("Something went wrong")
     }
 
     override fun getAnimeList(): Flow<List<ListEntity>> {
-      return dao.getLists()
+        return dao.getLists()
     }
 
     override suspend fun insertAnimeList(data: ListEntity) {
